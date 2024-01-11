@@ -1,4 +1,4 @@
-const algoOptions = [
+const algoFunctionOptions = [
   {
     name: 'Largest Groups --> Largest Tables (First)',
     groupSort: function (a, b) {
@@ -28,6 +28,14 @@ const algoOptions = [
   }
 ]
 
+function listLen2D(list2D) {
+  let sum = 0
+  for (let i = 0; i < list2D.length; i++) {
+    sum += list2D[i].length
+  }
+  return sum
+}
+
 function sortTableSeats(groups, tables, groupSortFunc, tableSortFunc) {
   let tableObjs = []
   tables.forEach((table) => {
@@ -53,18 +61,45 @@ function sortTableSeats(groups, tables, groupSortFunc, tableSortFunc) {
   return tableObjs
 }
 
-function mainSort(mainGroups, mainTables, mainAlgoOptions) {
+function mainSort(mainGroups, mainTables, algoOptions) {
   let result = null
   for (let i = 0; i < algoOptions.length; i++) {
     result = sortTableSeats(
       mainGroups,
       mainTables,
-      mainAlgoOptions[i].groupSort,
-      mainAlgoOptions[i].tableSort
+      algoOptions[i].groupSort,
+      algoOptions[i].tableSort
     )
     if (result != null) break
   }
   return result
 }
 
-export { mainSort, algoOptions }
+function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
+  let result = null
+  let tableArr = Array(Math.ceil(listLen2D(groupArr) / maxSeats)).fill(maxSeats)
+  for (let n = 0; n < 10; n++) {
+    tableArr.push(maxSeats)
+    for (let i = 0; i < algoOptions.length; i++) {
+      result = sortTableSeats(
+        groupArr,
+        tableArr,
+        algoOptions[i].groupSort,
+        algoOptions[i].tableSort
+      )
+
+      if (result != null) {
+        let test = true
+        for (let tableIndex = 0; tableIndex < result.length; tableIndex++) {
+          const currentSeats = result[tableIndex]['occupants']
+          if (minSeats > currentSeats) test = false
+          break
+        }
+        if (test) return result
+      }
+    }
+  }
+  return result
+}
+
+export { mainSort, rangeSort, listLen2D, algoFunctionOptions }

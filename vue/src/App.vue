@@ -1,25 +1,20 @@
 <script setup>
 import { ref } from 'vue'
-import { mainSort, algoOptions } from './sortingAlgo.js'
+import { mainSort, rangeSort, algoFunctionOptions, listLen2D } from './sortingAlgo.js'
 import { testGroups, testTables } from './testData.js'
 
-function listLen2D(list2D) {
-  let sum = 0
-  for (let i = 0; i < list2D.length; i++) {
-    sum += list2D[i].length
-  }
-  return sum
-}
-
 // test sorting function
-const sortedTables = ref(mainSort(testGroups, testTables, algoOptions))
+// const sortedTables = ref(mainSort(testGroups, testTables, algoFunctionOptions))
+const sortedTables = ref(rangeSort(testGroups, algoFunctionOptions, 14, 8))
 </script>
 
 <template>
   <h1>Prom Table Sorting App</h1>
   <br />
   <div class="table" v-for="table in sortedTables">
-    <p>{{ table.capacity - listLen2D(table.occupants) }}/{{ table.capacity }} Seats</p>
+    <p class="text">
+      {{ table.capacity - listLen2D(table.occupants) }}/{{ table.capacity }} Seats Unoccupied
+    </p>
     <div class="group" v-for="group in table.occupants">
       <p class="person" v-for="person in group">{{ person }}</p>
     </div>
@@ -43,5 +38,9 @@ const sortedTables = ref(mainSort(testGroups, testTables, algoOptions))
   background-color: cadetblue;
   padding: 0.5rem;
   margin: 0.5rem;
+}
+
+.text {
+  color: wheat;
 }
 </style>
