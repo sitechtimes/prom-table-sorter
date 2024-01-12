@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { mainSort, rangeSort, algoFunctionOptions, listLen2D } from './sortingAlgo.js'
+import { mainSort, rangeSort, algoFunctionOptions, arrayLen2D } from './sortingAlgo.js'
 import { testGroups, testTables } from './testData.js'
 
 // test sorting function
@@ -13,7 +13,7 @@ const sortedTables = ref(rangeSort(testGroups, algoFunctionOptions, 14, 8))
   <br />
   <div class="table" v-for="table in sortedTables">
     <p class="text">
-      {{ table.capacity - listLen2D(table.occupants) }}/{{ table.capacity }} Seats Unoccupied
+      {{ table.capacity - arrayLen2D(table.occupants) }}/{{ table.capacity }} Seats Unoccupied
     </p>
     <div class="group" v-for="group in table.occupants">
       <p class="person" v-for="person in group">{{ person }}</p>

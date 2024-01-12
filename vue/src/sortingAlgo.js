@@ -28,7 +28,13 @@ const algoFunctionOptions = [
   }
 ]
 
-function listLen2D(list2D) {
+function arraySum(arr) {
+  let sum = 0
+  for (let i = 0; i < arr.length; i++) sum += arr[i]
+  return sum
+}
+
+function arrayLen2D(list2D) {
   let sum = 0
   for (let i = 0; i < list2D.length; i++) {
     sum += list2D[i].length
@@ -61,7 +67,26 @@ function sortTableSeats(groups, tables, groupSortFunc, tableSortFunc) {
   return tableObjs
 }
 
+function checkInputValidity(checkGroupArr, checkTableArr, largeToLargeAlgoObj) {
+  const tableSum = arraySum(checkTableArr)
+  const guestSum = arrayLen2D(checkGroupArr)
+  if (tableSum < guestSum)
+    throw Error(`Too few table seats: there are ${tableSum} table seats, but ${guestSum} guests.`)
+
+  checkGroupArr.sort(largeToLargeAlgoObj.groupSort)
+  checkTableArr.sort(largeToLargeAlgoObj.tableSort)
+
+  if (checkGroupArr[0].length > checkTableArr[0])
+    throw Error(`Too few table seats: there are ${tableSum} table seats, but ${guestSum} guests.`)
+}
+
 function mainSort(mainGroups, mainTables, algoOptions) {
+  checkInputValidity(
+    mainGroups,
+    mainTables,
+    algoOptions.findIndex((e) => e.name == 'Largest Groups --> Largest Tables (First)')
+  )
+
   let result = null
   for (let i = 0; i < algoOptions.length; i++) {
     result = sortTableSeats(
@@ -76,8 +101,14 @@ function mainSort(mainGroups, mainTables, algoOptions) {
 }
 
 function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
+  let tableArr = Array(Math.ceil(arrayLen2D(groupArr) / maxSeats)).fill(maxSeats)
+  checkInputValidity(
+    groupArr,
+    tableArr,
+    algoOptions.findIndex((e) => e.name == 'Largest Groups --> Largest Tables (First)')
+  )
+
   let result = null
-  let tableArr = Array(Math.ceil(listLen2D(groupArr) / maxSeats)).fill(maxSeats)
   for (let n = 0; n < 10; n++) {
     tableArr.push(maxSeats)
     for (let i = 0; i < algoOptions.length; i++) {
@@ -102,4 +133,4 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
   return result
 }
 
-export { mainSort, rangeSort, listLen2D, algoFunctionOptions }
+export { mainSort, rangeSort, arrayLen2D, algoFunctionOptions }
