@@ -55,14 +55,6 @@ function sortTableSeats(groups, tables, groupSortFunc, tableSortFunc) {
   groups.sort(groupSortFunc);
 
   for (let i = 0; i < groups.length; i++) {
-    // for debugging purposes
-    console.log("~ ~ ~ ~ ~ begin info ~ ~ ~ ~ ~");
-    console.log("Groups Left (below):");
-    console.log(groups);
-    console.log("Tables (below):");
-    console.log(tableObjs);
-    console.log("~ ~ ~ ~ ~ end info ~ ~ ~ ~ ~");
-
     if (tableObjs[0].unoccupiedSeats >= groups[i].length) {
       tableObjs[0].occupants.push(groups[i]);
       tableObjs[0].unoccupiedSeats -= groups[i].length;
