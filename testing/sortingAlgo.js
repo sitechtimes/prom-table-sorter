@@ -72,14 +72,16 @@ function checkInputValidity(checkGroupArr, checkTableArr, largeToLargeAlgoObj) {
   const guestSum = arrayLen2D(checkGroupArr);
   if (tableSum < guestSum) {
     throw Error(
-      `Too few table seats: there are ${tableSum} table seats, but ${guestSum} guests.`
+      `ERROR:
+      Too few table seats: there are ${tableSum} table seats, but ${guestSum} guests.`
     );
   }
   checkGroupArr.sort(largeToLargeAlgoObj.groupSort);
   checkTableArr.sort(largeToLargeAlgoObj.tableSort);
   if (checkGroupArr[0].length > checkTableArr[0]) {
     throw Error(
-      `Tables too small: the largest table has ${checkTableArr[0]} seats, but the largest group has ${checkGroupArr[0].length} guests.`
+      `ERROR:
+      Tables too small: the largest table has ${checkTableArr[0]} seats, but the largest group has ${checkGroupArr[0].length} guests.`
     );
   }
 }
@@ -132,7 +134,7 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
       if (result != null) {
         let isValidResult = true;
         for (let tableIndex = 0; tableIndex < result.length; tableIndex++) {
-          const currentSeats = result[tableIndex]["occupants"];
+          const currentSeats = result[tableIndex]["occupants"].length;
           if (minSeats > currentSeats) isValidResult = false;
           break;
         }
@@ -142,7 +144,10 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
     tableArr.push(maxSeats);
   }
   if (!result) {
-    throw Error(`null result; ended with ${tableArr.length} tables.`);
+    throw Error(
+      `ERROR:
+      Groups cannot be sorted into tables with current settings. Try decreasing the minimum number of seats per table, or increasing the maximum number of seats per table.`
+    );
   }
   return result;
 }

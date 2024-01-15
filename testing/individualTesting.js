@@ -93,7 +93,7 @@ let groupList = [
 ];
 
 const maxSeats = 15;
-const minSeats = 6;
+const minSeats = 10;
 
 console.log(`>>>>>>>>
   Max Seats: ${maxSeats}
@@ -107,5 +107,5 @@ try {
   console.log(rangeSort(groupList, algoFunctionOptions, maxSeats, minSeats));
 } catch (error) {
   console.error(error);
-  // alert(error);
+  alert(error.message);
 }
