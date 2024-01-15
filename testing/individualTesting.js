@@ -92,7 +92,7 @@ let groupList = [
   ],
 ];
 
-const maxSeats = 15;
+const maxSeats = 12;
 const minSeats = 10;
 
 console.log(`>>>>>>>>

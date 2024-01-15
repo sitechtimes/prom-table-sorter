@@ -67,32 +67,45 @@ function sortTableSeats(groups, tables, groupSortFunc, tableSortFunc) {
   return tableObjs;
 }
 
-function checkInputValidity(checkGroupArr, checkTableArr, largeToLargeAlgoObj) {
+function checkInputValidity(
+  checkGroupArr,
+  checkTableArr,
+  largeToLargeAlgoObj,
+  totalErrorMsg,
+  individualErrorMsg
+) {
   const tableSum = arraySum(checkTableArr);
   const guestSum = arrayLen2D(checkGroupArr);
   if (tableSum < guestSum) {
     throw Error(
-      `ERROR:
-      Too few table seats: there are ${tableSum} table seats, but ${guestSum} guests.`
+      totalErrorMsg
+        .replace("{tableSum}", tableSum)
+        .replace("{guestSum}", guestSum)
     );
   }
   checkGroupArr.sort(largeToLargeAlgoObj.groupSort);
   checkTableArr.sort(largeToLargeAlgoObj.tableSort);
   if (checkGroupArr[0].length > checkTableArr[0]) {
     throw Error(
-      `ERROR:
-      Tables too small: the largest table has ${checkTableArr[0]} seats, but the largest group has ${checkGroupArr[0].length} guests.`
+      individualErrorMsg
+        .replace("{tableSeats}", checkTableArr[0])
+        .replace("{groupGuests}", checkGroupArr[0].length)
     );
   }
 }
 
+// mainSort not fully tested; doesn't have handling of edge cases
 function mainSort(mainGroups, mainTables, algoOptions) {
   checkInputValidity(
     mainGroups,
     mainTables,
     algoOptions.findIndex(
       (e) => e.name == "Largest Groups --> Largest Tables (First)"
-    )
+    ),
+    `ERROR:
+      Too few tables: there are {tableSum} total table seats, but {guestSum} guests. Try increasing the number of tables.`,
+    `ERROR:
+      Tables too small: the largest table has {tableSeats} seats, but the largest group has {groupGuests} guests. Try increasing the number of table seats.`
   );
 
   let result = null;
@@ -117,7 +130,9 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
     tableArr,
     algoOptions.findIndex(
       (e) => e.name == "Largest Groups --> Largest Tables (First)"
-    )
+    ),
+    `INTENRAL ERROR:\n\nThis error was most likely caused by an internal issue with the code, and the error message associated with this error is most likely inapplicable. Below is that error message anyway:\n\nToo few tables: there are {tableSum} total table seats, but {guestSum} guests. Try increasing the number of tables.`,
+    `ERROR:\n\nTables too small: the largest table has {tableSeats} seats, but the largest group has {groupGuests} guests. Try increasing the maximum number of seats per table.`
   );
 
   let result = null;
@@ -145,8 +160,7 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
   }
   if (!result) {
     throw Error(
-      `ERROR:
-      Groups cannot be sorted into tables with current settings. Try decreasing the minimum number of seats per table, or increasing the maximum number of seats per table.`
+      `ERROR:\n\nGroups cannot be sorted into tables with current settings. Try decreasing the minimum number of seats per table, or increasing the maximum number of seats per table.`
     );
   }
   return result;
