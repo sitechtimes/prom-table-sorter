@@ -55,6 +55,14 @@ function sortTableSeats(groups, tables, groupSortFunc, tableSortFunc) {
   groups.sort(groupSortFunc);
 
   for (let i = 0; i < groups.length; i++) {
+    // for debugging purposes
+    console.log("~ ~ ~ ~ ~ begin info ~ ~ ~ ~ ~");
+    console.log("Groups Left (below):");
+    console.log(groups);
+    console.log("Tables (below):");
+    console.log(tableObjs);
+    console.log("~ ~ ~ ~ ~ end info ~ ~ ~ ~ ~");
+
     if (tableObjs[0].unoccupiedSeats >= groups[i].length) {
       tableObjs[0].occupants.push(groups[i]);
       tableObjs[0].unoccupiedSeats -= groups[i].length;
@@ -120,8 +128,7 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
 
   let result = null;
   const maxAdditionalTables = groupArr.length - tableArr.length;
-  for (let n = 0; n < maxAdditionalTables; n++) {
-    tableArr.push(maxSeats);
+  for (let n = 0; n <= maxAdditionalTables; n++) {
     for (let i = 0; i < algoOptions.length; i++) {
       result = sortTableSeats(
         groupArr,
@@ -131,15 +138,16 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
       );
 
       if (result != null) {
-        let test = true;
+        let isValidResult = true;
         for (let tableIndex = 0; tableIndex < result.length; tableIndex++) {
           const currentSeats = result[tableIndex]["occupants"];
-          if (minSeats > currentSeats) test = false;
+          if (minSeats > currentSeats) isValidResult = false;
           break;
         }
-        if (test) return result;
+        if (isValidResult) return result;
       }
     }
+    tableArr.push(maxSeats);
   }
   if (!result) {
     throw Error(`null result; ended with ${tableArr.length} tables.`);
