@@ -19,10 +19,13 @@ for (let loops = 0; loops < testCases; loops++) {
   const minSeats = Math.round(Math.random() * 6 + 4);
 
   console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-  console.log(`Max Seats: ${maxSeats}
-  Min Seats: ${minSeats}`);
+  console.log(`
+  Test Case: ${loops}
+  Max Seats: ${maxSeats}
+  Min Seats: ${minSeats}
+  Groups (below):`);
   console.log(groupList);
-  console.log("-----------------------------");
+  console.log("---result---");
 
   console.log(rangeSort(groupList, algoFunctionOptions, maxSeats, minSeats));
   /* try {
