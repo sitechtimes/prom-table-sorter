@@ -99,9 +99,11 @@ function mainSort(mainGroups, mainTables, algoOptions) {
   checkInputValidity(
     mainGroups,
     mainTables,
-    algoOptions.findIndex(
-      (e) => e.name == "Largest Groups --> Largest Tables (First)"
-    ),
+    algoOptions[
+      algoOptions.findIndex(
+        (e) => e.name == "Largest Groups --> Largest Tables (First)"
+      )
+    ],
     `ERROR:
       Too few tables: there are {tableSum} total table seats, but {guestSum} guests. Try increasing the number of tables.`,
     `ERROR:
@@ -128,9 +130,11 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
   checkInputValidity(
     groupArr,
     tableArr,
-    algoOptions.findIndex(
-      (e) => e.name == "Largest Groups --> Largest Tables (First)"
-    ),
+    algoOptions[
+      algoOptions.findIndex(
+        (e) => e.name == "Largest Groups --> Largest Tables (First)"
+      )
+    ],
     `INTENRAL ERROR:\n\nThis error was most likely caused by an internal issue with the code, and the error message associated with this error is most likely inapplicable. Below is that error message anyway:\n\nToo few tables: there are {tableSum} total table seats, but {guestSum} guests. Try increasing the number of tables.`,
     `ERROR:\n\nTables too small: the largest table has {tableSeats} seats, but the largest group has {groupGuests} guests. Try increasing the maximum number of seats per table.`
   );
@@ -149,7 +153,8 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
       if (result != null) {
         let isValidResult = true;
         for (let tableIndex = 0; tableIndex < result.length; tableIndex++) {
-          const currentSeats = result[tableIndex]["occupants"].length;
+          const currentSeats = result[tableIndex]["occupants"]; //.length;
+          console.log(currentSeats);
           if (minSeats > currentSeats) isValidResult = false;
           break;
         }

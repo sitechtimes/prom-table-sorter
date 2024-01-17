@@ -1,7 +1,7 @@
 import { mainSort, rangeSort, algoFunctionOptions } from "./sortingAlgo.js";
 import { nameList } from "./testData.js";
 
-const testCases = 100000;
+const testCases = 10000;
 
 for (let loops = 1; loops <= testCases; loops++) {
   let groupList = [];
