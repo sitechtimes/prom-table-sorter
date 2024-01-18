@@ -152,11 +152,17 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
 
       if (result != null) {
         let isValidResult = true;
+        console.log(result);
         for (let tableIndex = 0; tableIndex < result.length; tableIndex++) {
-          const currentSeats = result[tableIndex]["occupants"]; //.length;
-          console.log(currentSeats);
-          if (minSeats > currentSeats) isValidResult = false;
-          break;
+          const currentSeats = arrayLen2D(result[tableIndex].occupants); //.length;
+          // console.log(result[tableIndex]["occupants"].length);
+          // console.log(currentSeats);
+          // console.log(`Current seats: ${currentSeats}
+          // Min seats: ${minSeats}`);
+          if (minSeats > currentSeats) {
+            isValidResult = false;
+            break;
+          }
         }
         if (isValidResult) return result;
       }
