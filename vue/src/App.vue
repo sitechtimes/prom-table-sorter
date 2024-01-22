@@ -5,11 +5,25 @@ import { testGroups, testTables } from './testData.js'
 
 // test sorting function
 // const sortedTables = ref(mainSort(testGroups, testTables, algoFunctionOptions))
-const sortedTables = ref(rangeSort(testGroups, algoFunctionOptions, 14, 8))
+const sortedTables = ref([])
+const minSeats = ref(null)
+const maxSeats = ref(null)
 </script>
 
 <template>
   <h1>Prom Table Sorting App</h1>
+  <label for="min-seats">Minimum Number of Seats per Table</label>
+  <input v-model="minSeats" type="number" name="min-seats" min="0" step="1" />
+  <br />
+  <label for="max-seats">Maximum Number of Seats per Table</label>
+  <input v-model="maxSeats" type="number" name="max-seats" min="1" step="1" />
+  <br />
+  <button
+    @click="sortedTables.value = rangeSort(testGroups, algoFunctionOptions, maxSeats, minSeats)"
+  >
+    Sort
+  </button>
+  <br />
   <br />
   <div class="table" v-for="table in sortedTables">
     <p class="text">
