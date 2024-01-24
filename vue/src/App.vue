@@ -3,11 +3,19 @@ import { ref } from 'vue'
 import { mainSort, rangeSort, algoFunctionOptions, arrayLen2D } from './sortingAlgo.js'
 import { testGroups, testTables } from './testData.js'
 
-// test sorting function
-// const sortedTables = ref(mainSort(testGroups, testTables, algoFunctionOptions))
 const sortedTables = ref([])
 const minSeats = ref(null)
 const maxSeats = ref(null)
+
+// console.log(rangeSort(testGroups, algoFunctionOptions, maxSeats.value, minSeats.value))
+
+function executeSort() {
+  try {
+    sortedTables.value = rangeSort(testGroups, algoFunctionOptions, maxSeats.value, minSeats.value)
+  } catch (error) {
+    alert(error.message)
+  }
+}
 </script>
 
 <template>
@@ -18,11 +26,7 @@ const maxSeats = ref(null)
   <label for="max-seats">Maximum Number of Seats per Table</label>
   <input v-model="maxSeats" type="number" name="max-seats" min="1" step="1" />
   <br />
-  <button
-    @click="sortedTables.value = rangeSort(testGroups, algoFunctionOptions, maxSeats, minSeats)"
-  >
-    Sort
-  </button>
+  <button @click="executeSort">Sort</button>
   <br />
   <br />
   <div class="table" v-for="table in sortedTables">
