@@ -1,12 +1,12 @@
 <script setup>
 import { ref } from 'vue'
-import { read, utils } from 'xlsx'
+import { read, utils, writeFile } from 'xlsx'
 import { mainSort, rangeSort, algoFunctionOptions, arrayLen2D } from './sortingAlgo.js'
 import { testGroups, testTables } from './testData.js'
 
 const sortedTables = ref(null)
-const minSeats = ref(null)
-const maxSeats = ref(null)
+const minSeats = ref(8)
+const maxSeats = ref(14)
 const fileInput = ref(null)
 
 async function getGroups() {
@@ -25,6 +25,26 @@ async function executeSort() {
     alert(error.message)
   }
 }
+
+async function exportResultsAsXLSX() {
+  let resultArray2D = []
+  sortedTables.value.forEach((table) => {
+    let tableOccupants = []
+    table.occupants.forEach((group) => {
+      group.forEach((occupant) => {
+        tableOccupants.push(occupant)
+        console.log(occupant)
+      })
+    })
+    resultArray2D.push(tableOccupants)
+  })
+  console.log(resultArray2D)
+  const worksheet = utils.aoa_to_sheet(resultArray2D)
+  const workbook = utils.book_new()
+  // utils.book_append_sheet(workbook, worksheet, 'Sorted Tables')
+  utils.book_append_sheet(workbook, worksheet)
+  writeFile(workbook, 'SortedTables.xlsx', { compression: true })
+}
 </script>
 
 <template>
@@ -39,8 +59,6 @@ async function executeSort() {
   <br />
   <input type="file" name="input-groups" ref="fileInput" accept=".xlsx" />
   <br />
-  <button @click="getGroups">get groups</button>
-  <br />
   <br />
   <label for="min-seats">Minimum Number of Seats per Table: </label>
   <input v-model="minSeats" type="number" name="min-seats" min="0" step="1" />
@@ -50,6 +68,12 @@ async function executeSort() {
   <br />
   <button @click="executeSort">Sort</button>
   <br />
+  <br />
+  <div v-if="sortedTables != null">
+    <p>----------</p>
+    <button @click="exportResultsAsXLSX">Download Sorted Tables</button>
+  </div>
+
   <br />
   <div class="table" v-for="table in sortedTables">
     <p class="text">{{ arrayLen2D(table.occupants) }}/{{ table.capacity }} Seats Occupied</p>
