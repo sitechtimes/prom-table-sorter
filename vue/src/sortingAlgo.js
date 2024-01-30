@@ -88,6 +88,18 @@ function checkInputValidity(
         .replace('{groupGuests}', checkGroupArr[0].length)
     )
   }
+
+  for (let i = 0; i < checkGroupArr.length; i++) {
+    let timesAppeared = 0
+    for (let j = 0; j < checkGroupArr.length; j++) {
+      if (checkGroupArr[i] == checkGroupArr[j]) {
+        timesAppeared++
+        if (timesAppeared > 1) {
+          throw Error(`${checkGroupArr[i]} is a potential duplicate name`)
+        }
+      }
+    }
+  }
 }
 
 // mainSort not fully tested; doesn't have handling of edge cases
