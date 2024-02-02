@@ -5,8 +5,8 @@ import { mainSort, rangeSort, algoFunctionOptions, arrayLen2D } from './sortingA
 import { testGroups, testTables } from './testData.js'
 
 const sortedTables = ref(null)
-const minSeats = ref(8)
-const maxSeats = ref(14)
+const minSeats = ref(null)
+const maxSeats = ref(null)
 const fileInput = ref(null)
 
 async function getGroups() {
