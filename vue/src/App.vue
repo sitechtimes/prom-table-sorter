@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { read, utils, writeFile } from 'xlsx'
+import ExcelJS from 'exceljs'
 import { mainSort, rangeSort, algoFunctionOptions, arrayLen2D } from './sortingAlgo.js'
 import { testGroups, testTables } from './testData.js'
 
@@ -10,11 +10,11 @@ const maxSeats = ref(null)
 const fileInput = ref(null)
 
 async function getGroups() {
-  const uploadFile = await fileInput.value.files[0].arrayBuffer()
-  const workbook = read(uploadFile)
-  const worksheet = workbook.Sheets[workbook.SheetNames[0]]
-  const dataArray = utils.sheet_to_json(worksheet, { header: 1 })
-  return dataArray
+  const uploadedFile = await fileInput.value.files[0].arrayBuffer()
+  const workbook = new ExcelJS.Workbook()
+  await workbook.xlsx.load(uploadedFile)
+  const worksheet = workbook.worksheets[0]
+  console.log(workbook)
 }
 
 async function executeSort() {
