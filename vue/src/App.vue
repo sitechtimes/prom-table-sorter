@@ -11,10 +11,18 @@ const fileInput = ref(null)
 
 async function getGroups() {
   const uploadedFile = await fileInput.value.files[0].arrayBuffer()
-  const workbook = new ExcelJS.Workbook()
-  await workbook.xlsx.load(uploadedFile)
-  const worksheet = workbook.worksheets[0]
-  console.log(workbook)
+  const importWorkbook = new ExcelJS.Workbook()
+  await importWorkbook.xlsx.load(uploadedFile)
+  const groupWorksheet = importWorkbook.worksheets[0]
+  let allGroups = []
+  groupWorksheet.eachRow((row) => {
+    let individualGroup = []
+    row.eachCell((cell) => {
+      individualGroup.push(cell.value)
+    })
+    allGroups.push(individualGroup)
+  })
+  return allGroups
 }
 
 async function executeSort() {
@@ -27,18 +35,36 @@ async function executeSort() {
 }
 
 async function exportResultsAsXLSX() {
-  let resultArray2D = []
+  const exportWorkbook = new ExcelJS.Workbook()
+  const sortedWorksheet = exportWorkbook.addWorksheet('Sorted Tables')
+  let duplicateArray = []
   sortedTables.value.forEach((table) => {
     let tableOccupants = []
     table.occupants.forEach((group) => {
       group.forEach((occupant) => {
         tableOccupants.push(occupant)
-        console.log(occupant)
       })
     })
-    resultArray2D.push(tableOccupants)
+    sortedWorksheet.addRow(tableOccupants)
   })
-  console.log(resultArray2D)
+
+  sortedWorksheet.eachRow((row) => {
+    row.eachCell((cell) => {
+      if (cell.value == 'guest name') {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'ccf52727' }
+        }
+      } else if (duplicateArray.includes(cell.value)) {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'ccf5bf27' }
+        }
+      }
+    })
+  })
   const worksheet = utils.aoa_to_sheet(resultArray2D)
   const workbook = utils.book_new()
   // utils.book_append_sheet(workbook, worksheet, 'Sorted Tables')
