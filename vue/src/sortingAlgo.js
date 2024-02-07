@@ -88,18 +88,22 @@ function checkInputValidity(
         .replace('{groupGuests}', checkGroupArr[0].length)
     )
   }
+}
 
+function tagDuplicates(checkGroupArr) {
   for (let i = 0; i < checkGroupArr.length; i++) {
-    let timesAppeared = 0
+    let alreadyAppeared = false
     for (let j = 0; j < checkGroupArr.length; j++) {
       if (checkGroupArr[i] == checkGroupArr[j]) {
-        timesAppeared++
-        if (timesAppeared > 1) {
-          throw Error(`${checkGroupArr[i]} is a potential duplicate name`)
-        }
+        alreadyAppeared = true
+        break
       }
     }
+    alreadyAppeared
+      ? (checkGroupArr[i] = { name: checkGroupArr[i], duplicate: true })
+      : (checkGroupArr[i] = { name: checkGroupArr[i], duplicate: false })
   }
+  return checkGroupArr
 }
 
 // mainSort not fully tested; doesn't have handling of edge cases
@@ -116,10 +120,12 @@ function mainSort(mainGroups, mainTables, algoOptions) {
       Tables too small: the largest table has {tableSeats} seats, but the largest group has {groupGuests} guests. Try increasing the number of table seats.`
   )
 
+  const groupObjArr = tagDuplicates(mainGroups)
+
   let result = null
   for (let i = 0; i < algoOptions.length; i++) {
     result = sortTableSeats(
-      mainGroups,
+      groupObjArr,
       mainTables,
       algoOptions[i].groupSort,
       algoOptions[i].tableSort
@@ -141,12 +147,14 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
     `ERROR:\n\nTables too small: the largest table has {tableSeats} seats, but the largest group has {groupGuests} guests. Try increasing the maximum number of seats per table.`
   )
 
+  const groupObjArr = tagDuplicates(groupArr)
+
   let result = null
   const maxAdditionalTables = groupArr.length - tableArr.length
   for (let n = 0; n <= maxAdditionalTables; n++) {
     for (let i = 0; i < algoOptions.length; i++) {
       result = sortTableSeats(
-        groupArr,
+        groupObjArr,
         tableArr,
         algoOptions[i].groupSort,
         algoOptions[i].tableSort

@@ -37,33 +37,32 @@ async function executeSort() {
 async function exportResultsAsXLSX() {
   const exportWorkbook = new ExcelJS.Workbook()
   const sortedWorksheet = exportWorkbook.addWorksheet('Sorted Tables')
-  let duplicateArray = []
-  sortedTables.value.forEach((table) => {
-    let tableOccupants = []
-    table.occupants.forEach((group) => {
+  sortedTables.value.forEach((table, rowIndex) => {
+    const row = sortedWorksheet.getRow(rowIndex)
+    table.occupants.forEach((group, cellIndex) => {
       group.forEach((occupant) => {
-        tableOccupants.push(occupant)
+        const cell = row.getCell(cellIndex)
+        cell.value = occupant.name
+        if (occupant.name == 'guest name') {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'ccf52727' }
+          }
+        } else if (occupant.duplicate == true) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'ccf5bf27' }
+          }
+        }
       })
     })
     sortedWorksheet.addRow(tableOccupants)
   })
 
   sortedWorksheet.eachRow((row) => {
-    row.eachCell((cell) => {
-      if (cell.value == 'guest name') {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'ccf52727' }
-        }
-      } else if (duplicateArray.includes(cell.value)) {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'ccf5bf27' }
-        }
-      }
-    })
+    row.eachCell((cell) => {})
   })
   const worksheet = utils.aoa_to_sheet(resultArray2D)
   const workbook = utils.book_new()
