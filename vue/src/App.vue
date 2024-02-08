@@ -27,6 +27,7 @@ async function getGroups() {
 
 async function executeSort() {
   const guestGroups = await getGroups()
+  console.log(guestGroups)
   try {
     sortedTables.value = rangeSort(guestGroups, algoFunctionOptions, maxSeats.value, minSeats.value)
   } catch (error) {
@@ -60,10 +61,8 @@ async function exportResultsAsXLSX() {
     })
     sortedWorksheet.addRow(tableOccupants)
   })
+  await exportWorkbook.xlsx.writeFile()
 
-  sortedWorksheet.eachRow((row) => {
-    row.eachCell((cell) => {})
-  })
   const worksheet = utils.aoa_to_sheet(resultArray2D)
   const workbook = utils.book_new()
   // utils.book_append_sheet(workbook, worksheet, 'Sorted Tables')

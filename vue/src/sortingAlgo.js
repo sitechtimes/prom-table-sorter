@@ -91,19 +91,31 @@ function checkInputValidity(
 }
 
 function tagDuplicates(checkGroupArr) {
-  for (let i = 0; i < checkGroupArr.length; i++) {
-    let alreadyAppeared = false
-    for (let j = 0; j < checkGroupArr.length; j++) {
-      if (checkGroupArr[i] == checkGroupArr[j]) {
-        alreadyAppeared = true
-        break
+  /*   for (let x = 0; x < checkGroupArr.length; x++) {
+    for (let y = 0; y < checkGroupArr[x].length; y++) {}
+  } */
+  let newGroupArr = []
+  checkGroupArr.forEach((targetGroup) => {
+    let newGroup = []
+    targetGroup.forEach((targetName) => {
+      let timesAppeared = 0
+      for (let i = 0; i < checkGroupArr.length; i++) {
+        for (let j = 0; j < checkGroupArr[i].length; j++) {
+          if (targetName == checkGroupArr[i][j]) {
+            timesAppeared++
+            if (timesAppeared > 1) break
+          }
+        }
+        if (timesAppeared > 1) break
       }
-    }
-    alreadyAppeared
-      ? (checkGroupArr[i] = { name: checkGroupArr[i], duplicate: true })
-      : (checkGroupArr[i] = { name: checkGroupArr[i], duplicate: false })
-  }
-  return checkGroupArr
+
+      timesAppeared > 1
+        ? newGroup.push({ name: targetName, duplicate: true })
+        : newGroup.push({ name: targetName, duplicate: false })
+    })
+    newGroupArr.push(newGroup)
+  })
+  return newGroupArr
 }
 
 // mainSort not fully tested; doesn't have handling of edge cases
