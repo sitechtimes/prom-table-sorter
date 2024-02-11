@@ -1,13 +1,13 @@
 <script setup>
 import { ref } from 'vue'
 import ExcelJS from 'exceljs'
-import { mainSort, rangeSort, algoFunctionOptions, arrayLen2D } from './sortingAlgo.js'
-import { testGroups, testTables } from './testData.js'
+import { rangeSort, algoFunctionOptions, arrayLen2D } from './sortingAlgo.js'
 
 const sortedTables = ref(null)
 const minSeats = ref(null)
 const maxSeats = ref(null)
 const fileInput = ref(null)
+const downloadURL = ref(null)
 
 async function getGroups() {
   const uploadedFile = await fileInput.value.files[0].arrayBuffer()
@@ -33,41 +33,41 @@ async function executeSort() {
   } catch (error) {
     alert(error.message)
   }
+  exportResultsAsXLSX()
 }
 
 async function exportResultsAsXLSX() {
   const exportWorkbook = new ExcelJS.Workbook()
   const sortedWorksheet = exportWorkbook.addWorksheet('Sorted Tables')
   sortedTables.value.forEach((table, rowIndex) => {
-    const row = sortedWorksheet.getRow(rowIndex)
-    table.occupants.forEach((group, cellIndex) => {
-      group.forEach((occupant) => {
-        const cell = row.getCell(cellIndex)
-        cell.value = occupant.name
-        if (occupant.name == 'guest name') {
+    const row = sortedWorksheet.getRow(rowIndex + 1)
+    let cellIndex = 1
+    table.occupants.forEach((group) => {
+      for (let i = 0; i < group.length; i++) {
+        const cell = row.getCell(cellIndex + i)
+        console.log(cell, cellIndex)
+        cell.value = group[i].name
+        if (group[i].name == 'guest name') {
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: 'ccf52727' }
           }
-        } else if (occupant.duplicate == true) {
+        } else if (group[i].duplicate == true) {
           cell.fill = {
             type: 'pattern',
             pattern: 'solid',
             fgColor: { argb: 'ccf5bf27' }
           }
         }
-      })
+      }
+      cellIndex += group.length
     })
-    sortedWorksheet.addRow(tableOccupants)
   })
-  await exportWorkbook.xlsx.writeFile()
-
-  const worksheet = utils.aoa_to_sheet(resultArray2D)
-  const workbook = utils.book_new()
-  // utils.book_append_sheet(workbook, worksheet, 'Sorted Tables')
-  utils.book_append_sheet(workbook, worksheet)
-  writeFile(workbook, 'SortedTables.xlsx', { compression: true })
+  const buffer = await exportWorkbook.xlsx.writeBuffer()
+  const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+  const blob = new Blob([buffer], { type: fileType })
+  downloadURL.value = URL.createObjectURL(blob)
 }
 </script>
 
@@ -95,14 +95,23 @@ async function exportResultsAsXLSX() {
   <br />
   <div v-if="sortedTables != null">
     <p>----------</p>
-    <button @click="exportResultsAsXLSX">Download Sorted Tables</button>
+    <a v-if="downloadURL == null" disabled class="btn-link">Loading...</a>
+    <a v-else :href="downloadURL" class="btn-link">Download Sorted Tables</a>
   </div>
 
   <br />
   <div class="table" v-for="table in sortedTables">
     <p class="text">{{ arrayLen2D(table.occupants) }}/{{ table.capacity }} Seats Occupied</p>
     <div class="group" v-for="group in table.occupants">
-      <p class="person" v-for="person in group">{{ person }}</p>
+      <div v-for="person in group">
+        <p v-if="person.name == 'guest name'" class="person unnamed">
+          <mark>{{ person.name }}</mark>
+        </p>
+        <p v-else-if="person.duplicate == true" class="person duplicate">
+          <mark>{{ person.name }}</mark>
+        </p>
+        <p v-else class="person">{{ person.name }}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -132,5 +141,32 @@ async function exportResultsAsXLSX() {
 
 .input-note {
   font-style: italic;
+}
+
+.btn-link {
+  font: 12.5px Arial;
+  text-decoration: none;
+  background-color: #e9e9ed;
+  color: #000000;
+  padding: 5px;
+  border: 1px solid #8f8f9d;
+  border-radius: 4.5px;
+}
+.btn-link:hover {
+  background-color: #d0d0d7;
+  border-color: #676774;
+}
+
+.btn-link:active {
+  background-color: #b1b1b9;
+  border-color: #484851;
+}
+
+.duplicate mark {
+  background-color: #f5ca50;
+}
+
+.unnamed mark {
+  background-color: #f55050;
 }
 </style>
