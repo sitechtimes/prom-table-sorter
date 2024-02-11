@@ -88,18 +88,34 @@ function checkInputValidity(
         .replace('{groupGuests}', checkGroupArr[0].length)
     )
   }
+}
 
-  for (let i = 0; i < checkGroupArr.length; i++) {
-    let timesAppeared = 0
-    for (let j = 0; j < checkGroupArr.length; j++) {
-      if (checkGroupArr[i] == checkGroupArr[j]) {
-        timesAppeared++
-        if (timesAppeared > 1) {
-          throw Error(`${checkGroupArr[i]} is a potential duplicate name`)
+function tagDuplicates(checkGroupArr) {
+  /*   for (let x = 0; x < checkGroupArr.length; x++) {
+    for (let y = 0; y < checkGroupArr[x].length; y++) {}
+  } */
+  let newGroupArr = []
+  checkGroupArr.forEach((targetGroup) => {
+    let newGroup = []
+    targetGroup.forEach((targetName) => {
+      let timesAppeared = 0
+      for (let i = 0; i < checkGroupArr.length; i++) {
+        for (let j = 0; j < checkGroupArr[i].length; j++) {
+          if (targetName == checkGroupArr[i][j]) {
+            timesAppeared++
+            if (timesAppeared > 1) break
+          }
         }
+        if (timesAppeared > 1) break
       }
-    }
-  }
+
+      timesAppeared > 1
+        ? newGroup.push({ name: targetName, duplicate: true })
+        : newGroup.push({ name: targetName, duplicate: false })
+    })
+    newGroupArr.push(newGroup)
+  })
+  return newGroupArr
 }
 
 // mainSort not fully tested; doesn't have handling of edge cases
@@ -116,10 +132,12 @@ function mainSort(mainGroups, mainTables, algoOptions) {
       Tables too small: the largest table has {tableSeats} seats, but the largest group has {groupGuests} guests. Try increasing the number of table seats.`
   )
 
+  const groupObjArr = tagDuplicates(mainGroups)
+
   let result = null
   for (let i = 0; i < algoOptions.length; i++) {
     result = sortTableSeats(
-      mainGroups,
+      groupObjArr,
       mainTables,
       algoOptions[i].groupSort,
       algoOptions[i].tableSort
@@ -141,12 +159,14 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
     `ERROR:\n\nTables too small: the largest table has {tableSeats} seats, but the largest group has {groupGuests} guests. Try increasing the maximum number of seats per table.`
   )
 
+  const groupObjArr = tagDuplicates(groupArr)
+
   let result = null
   const maxAdditionalTables = groupArr.length - tableArr.length
   for (let n = 0; n <= maxAdditionalTables; n++) {
     for (let i = 0; i < algoOptions.length; i++) {
       result = sortTableSeats(
-        groupArr,
+        groupObjArr,
         tableArr,
         algoOptions[i].groupSort,
         algoOptions[i].tableSort
