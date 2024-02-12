@@ -6,6 +6,7 @@ import { rangeSort, algoFunctionOptions, arrayLen2D } from './sortingAlgo.js'
 const sortedTables = ref(null)
 const minSeats = ref(null)
 const maxSeats = ref(null)
+const dataFormat = ref(null)
 const fileInput = ref(null)
 const downloadURL = ref(null)
 
@@ -15,6 +16,7 @@ async function getGroups() {
   await importWorkbook.xlsx.load(uploadedFile)
   const groupWorksheet = importWorkbook.worksheets[0]
   let allGroups = []
+
   groupWorksheet.eachRow((row) => {
     let individualGroup = []
     row.eachCell((cell) => {
@@ -73,15 +75,29 @@ async function exportResultsAsXLSX() {
 
 <template>
   <h1>Prom Table Sorting App</h1>
-  <label for="input-groups"
-    >Upload Group Excel File:
-    <br />
-    <span class="input-note"
-      >(Each row should have one person's name in each cell, each row is a seperate group.)</span
-    >
-  </label>
+  <label for="input-groups">Upload Group Excel File: </label>
   <br />
   <input type="file" name="input-groups" ref="fileInput" accept=".xlsx" />
+  <br />
+  <br />
+  <label for="data-format">Input File Data Format:</label>
+  <br />
+  <input v-model="dataFormat" type="radio" id="rows-columns" value="rows-columns" />
+  <label for="rows-columns"
+    >Each row has one person's name in each cell, and each row is a seperate group.</label
+  >
+  <br />
+  <input
+    v-model="dataFormat"
+    type="radio"
+    id="single-cell-comma-seperated"
+    value="single-cell-comma-seperated"
+  />
+  <label for="single-cell-comma-seperated"
+    >One cell in each row has all of a group's names in it, with each name being seperated by a
+    comma and each row being a seperate group.
+    <span class="input-note">(Google Sheets)</span></label
+  >
   <br />
   <br />
   <label for="min-seats">Minimum Number of Seats per Table: </label>
