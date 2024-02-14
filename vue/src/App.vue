@@ -9,6 +9,8 @@ const maxSeats = ref(null)
 const dataFormat = ref(null)
 const fileInput = ref(null)
 const downloadURL = ref(null)
+const cellRange = ref([null, null])
+const searchAllCells = ref(false)
 
 async function getGroups() {
   const uploadedFile = await fileInput.value.files[0].arrayBuffer()
@@ -75,38 +77,60 @@ async function exportResultsAsXLSX() {
 
 <template>
   <h1>Prom Table Sorting App</h1>
-  <label for="input-groups">Upload Group Excel File: </label>
   <br />
-  <input type="file" name="input-groups" ref="fileInput" accept=".xlsx" />
-  <br />
-  <br />
-  <label for="data-format">Input File Data Format:</label>
-  <br />
-  <input v-model="dataFormat" type="radio" id="rows-columns" value="rows-columns" />
-  <label for="rows-columns"
-    >Each row has one person's name in each cell, and each row is a seperate group.</label
-  >
-  <br />
-  <input
-    v-model="dataFormat"
-    type="radio"
-    id="single-cell-comma-seperated"
-    value="single-cell-comma-seperated"
-  />
-  <label for="single-cell-comma-seperated"
-    >One cell in each row has all of a group's names in it, with each name being seperated by a
-    comma and each row being a seperate group.
-    <span class="input-note">(Google Sheets)</span></label
-  >
-  <br />
-  <br />
-  <label for="min-seats">Minimum Number of Seats per Table: </label>
-  <input v-model="minSeats" type="number" name="min-seats" min="0" step="1" />
-  <br />
-  <label for="max-seats">Maximum Number of Seats per Table: </label>
-  <input v-model="maxSeats" type="number" name="max-seats" min="1" step="1" />
-  <br />
-  <button @click="executeSort">Sort</button>
+  <form>
+    <label for="input-groups">Upload Group Excel File: </label>
+
+    <input type="file" name="input-groups" ref="fileInput" accept=".xlsx" />
+    <br />
+    <br />
+    <label for="data-format">Input File Data Format:</label>
+    <br />
+    <input v-model="dataFormat" type="radio" id="rows-columns" value="rows-columns" checked />
+    <label for="rows-columns"
+      >Each row has one person's name in each cell, and each row is a seperate group.</label
+    >
+    <br />
+    <input
+      v-model="dataFormat"
+      type="radio"
+      id="single-cell-comma-seperated"
+      value="single-cell-comma-seperated"
+    />
+    <label for="single-cell-comma-seperated"
+      >One cell in each row has all of a group's names in it, with each name being seperated by a
+      comma and each row being a seperate group.
+      <span class="input-note">(Google Sheets)</span></label
+    >
+    <br />
+    <br />
+    <div v-if="searchAllCells" class="disabled">
+      <label for="cell-range">Cell Range: </label>
+      <input disabled v-model="cellRange" type="text" size="6" name="cell-range" id="cell-range" />
+    </div>
+    <div v-else>
+      <label for="cell-range">Cell Range: </label>
+      <input v-model="cellRange" type="text" size="6" name="cell-range" id="cell-range" />
+    </div>
+    <input
+      type="checkbox"
+      name="search-all-cells"
+      id="search-all-cells"
+      v-model="searchAllCells"
+      minlength="5"
+    />
+    <label for="search-all-cells">Search All Cells</label>
+    <br />
+    <br />
+    <label for="min-seats">Minimum Number of Seats per Table: </label>
+    <input v-model="minSeats" type="number" name="min-seats" min="0" step="1" />
+    <br />
+    <label for="max-seats">Maximum Number of Seats per Table: </label>
+    <input v-model="maxSeats" type="number" name="max-seats" min="1" step="1" />
+    <br />
+    <button @click="executeSort">Sort</button>
+  </form>
+
   <br />
   <br />
   <div v-if="sortedTables != null">
@@ -184,5 +208,8 @@ async function exportResultsAsXLSX() {
 
 .unnamed mark {
   background-color: #f55050;
+}
+.disabled {
+  opacity: 60%;
 }
 </style>
