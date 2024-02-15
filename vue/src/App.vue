@@ -12,20 +12,58 @@ const downloadURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
 
+function calcCellRange(startCell, endCell) {
+  startCell = startCell.toLowerCase()
+  endCell = endCell.toLowerCase()
+
+  const numArr = [('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')]
+  const letterArr = [
+    'a',
+    'b',
+    'c',
+    'd',
+    'e',
+    'f',
+    'g',
+    'h',
+    'i',
+    'j',
+    'k',
+    'l',
+    'm',
+    'n',
+    'o',
+    'p',
+    'q',
+    'r',
+    's',
+    't',
+    'u',
+    'v',
+    'w',
+    'x',
+    'y',
+    'z'
+  ]
+}
+
 async function getGroups() {
   const uploadedFile = await fileInput.value.files[0].arrayBuffer()
   const importWorkbook = new ExcelJS.Workbook()
   await importWorkbook.xlsx.load(uploadedFile)
   const groupWorksheet = importWorkbook.worksheets[0]
   let allGroups = []
-
-  groupWorksheet.eachRow((row) => {
-    let individualGroup = []
-    row.eachCell((cell) => {
-      individualGroup.push(cell.value)
+  if (searchAllCells == true) {
+    groupWorksheet.eachRow((row) => {
+      let individualGroup = []
+      row.eachCell((cell) => {
+        individualGroup.push(cell.value)
+      })
+      allGroups.push(individualGroup)
     })
-    allGroups.push(individualGroup)
-  })
+  } else {
+  }
+
   return allGroups
 }
 
@@ -81,7 +119,7 @@ async function exportResultsAsXLSX() {
   <form>
     <label for="input-groups">Upload Group Excel File: </label>
 
-    <input type="file" name="input-groups" ref="fileInput" accept=".xlsx" />
+    <input type="file" name="input-groups" ref="fileInput" accept=".xlsx" required />
     <br />
     <br />
     <label for="data-format">Input File Data Format:</label>
@@ -106,11 +144,51 @@ async function exportResultsAsXLSX() {
     <br />
     <div v-if="searchAllCells" class="disabled">
       <label for="cell-range">Cell Range: </label>
-      <input disabled v-model="cellRange" type="text" size="6" name="cell-range" id="cell-range" />
+      <input
+        disabled
+        v-model="cellRange[0]"
+        type="text"
+        size="1"
+        minlength="2"
+        name="cell-range"
+        id="cell-range"
+        required
+      />
+      :
+      <input
+        disabled
+        v-model="cellRange[1]"
+        type="text"
+        size="1"
+        minlength="2"
+        name="cell-range"
+        id="cell-range"
+        required
+      />
     </div>
     <div v-else>
       <label for="cell-range">Cell Range: </label>
-      <input v-model="cellRange" type="text" size="6" name="cell-range" id="cell-range" />
+      <input
+        v-model="cellRange[0]"
+        type="text"
+        size="1"
+        minlength="2"
+        name="cell-range"
+        id="cell-range"
+        required
+        placeholder="A1"
+      />
+      :
+      <input
+        v-model="cellRange[1]"
+        type="text"
+        size="1"
+        minlength="2"
+        name="cell-range"
+        id="cell-range"
+        required
+        placeholder="B2"
+      />
     </div>
     <input
       type="checkbox"
@@ -123,10 +201,10 @@ async function exportResultsAsXLSX() {
     <br />
     <br />
     <label for="min-seats">Minimum Number of Seats per Table: </label>
-    <input v-model="minSeats" type="number" name="min-seats" min="0" step="1" />
+    <input v-model="minSeats" type="number" name="min-seats" min="0" step="1" required />
     <br />
     <label for="max-seats">Maximum Number of Seats per Table: </label>
-    <input v-model="maxSeats" type="number" name="max-seats" min="1" step="1" />
+    <input v-model="maxSeats" type="number" name="max-seats" min="1" step="1" required />
     <br />
     <button @click="executeSort">Sort</button>
   </form>
