@@ -101,7 +101,7 @@ async function getGroups() {
   await importWorkbook.xlsx.load(uploadedFile)
   const groupWorksheet = importWorkbook.worksheets[0]
   let allGroups = []
-  const isCommaSeperated = (dataFormat.value == "single-cell-comma-seperated" ? true : false)
+  const isCommaSeperated = (dataFormat.value == "single-cell-comma-seperated")
   if (searchAllCells.value == true) {
     groupWorksheet.eachRow((row) => {
       let individualGroup = []
@@ -197,7 +197,7 @@ async function exportResultsAsXLSX() {
         disabled
         v-model="cellRange[0]"
         type="text"
-        size="1"
+        size="4"
         minlength="2"
         name="cell-range"
         id="cell-range"
@@ -208,7 +208,7 @@ async function exportResultsAsXLSX() {
         disabled
         v-model="cellRange[1]"
         type="text"
-        size="1"
+        size="4"
         minlength="2"
         name="cell-range"
         id="cell-range"
@@ -220,7 +220,7 @@ async function exportResultsAsXLSX() {
       <input
         v-model="cellRange[0]"
         type="text"
-        size="1"
+        size="4"
         minlength="2"
         name="cell-range"
         id="cell-range"
@@ -231,7 +231,7 @@ async function exportResultsAsXLSX() {
       <input
         v-model="cellRange[1]"
         type="text"
-        size="1"
+        size="4"
         minlength="2"
         name="cell-range"
         id="cell-range"
