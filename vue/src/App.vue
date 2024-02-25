@@ -13,7 +13,7 @@ const cellRange = ref([null, null])
 const searchAllCells = ref(false)
 
 
-function calcCellRange(cellRange) {
+function calcCellRange(inputCellRange) {
   const errorMsg = "Invalid Cell Coordinates Inputted"
   const numArr = [('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')]
   const letterArr = [
@@ -46,8 +46,8 @@ function calcCellRange(cellRange) {
   ]
   try {
   let rangeArr = []
-  for (let i = 0; i < cellRange.length; i++) {
-    const cell = cellRange[i].toLowerCase()
+  for (let i = 0; i < inputCellRange.length; i++) {
+    const cell = inputCellRange[i].toLowerCase()
     let sliceIndex = 0
     for (let j = 0; j < cell.length; j++) {
       if (numArr.indexOf(cell[j]) > -1) {
@@ -70,18 +70,15 @@ function calcCellRange(cellRange) {
   // format: let rangeArr = [["A", 12], ["BA", 18]]
   for (let i = 0; i < rangeArr.length; i++) {
     rangeArr[i][1] = Number(rangeArr[i][1])
-
     let sum = 0
-    let base26Str = rangeArr[i][0].reverse()
+    const base26Str = rangeArr[i][0].reverse()
     for (let j = 0; j < base26Str.length; j++) {
       sum += (letterArr.indexOf(base26Str[j]) * (26 ** j))
     }
     rangeArr[i][0] = sum
   }
-
   if (rangeArr[0][0] > rangeArr[1][0]) throw Error(`${errorMsg}: start cell's column greater than end cell's column`)
   if (rangeArr[0][1] > rangeArr[1][1]) throw Error(`${errorMsg}: start cell's row greater than end cell's row`)
-
   return rangeArr
   } catch (error) {
     alert(error)
@@ -90,9 +87,13 @@ function calcCellRange(cellRange) {
 
 function processRawStr(rawStr, targetArr, valuesCommaSeperated) {
   if (valuesCommaSeperated == true) rawStr.split(',').forEach((e) => {
-    targetArr.push(e.trim())
+    const processedStr = e.trim()
+    if (processedStr.length > 0) targetArr.push(processedStr)
   })
-  else targetArr.push(rawStr.trim())
+  else {
+    const processedStr = rawStr.trim()
+    if (processedStr.length > 0) targetArr.push(processedStr)
+  }
 }
 
 async function getGroups() {
@@ -111,6 +112,16 @@ async function getGroups() {
       allGroups.push(individualGroup)
     })
   } else {
+    const processedCellRange = calcCellRange(cellRange.value[0], cellRange.value[1]) // format: [[3, 12], [10, 18]]
+    for (let rowIndex = processedCellRange[0][1]; rowIndex <= processedCellRange[1][1]; rowIndex++) {
+      const row = groupWorksheet.getRow(rowIndex)
+      let individualGroup = []
+      for (let columnIndex = processedCellRange[0][0]; columnIndex <= processedCellRange[1][0]; columnIndex++) {
+        const cell = row.getCell(columnIndex)
+        processRawStr(cell.value, individualGroup, isCommaSeperated)
+      }
+      allGroups.push(individualGroup)
+    }
   }
 
   return allGroups
