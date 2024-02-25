@@ -12,10 +12,9 @@ const downloadURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
 
-function calcCellRange(startCell, endCell) {
-  startCell = startCell.toLowerCase()
-  endCell = endCell.toLowerCase()
 
+function calcCellRange(cellRange) {
+  const errorMsg = "Invalid Cell Coordinates Inputted"
   const numArr = [('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')]
   const letterArr = [
     'a',
@@ -45,6 +44,48 @@ function calcCellRange(startCell, endCell) {
     'y',
     'z'
   ]
+  try {
+  let rangeArr = []
+  for (let i = 0; i < cellRange.length; i++) {
+    const cell = cellRange[i].toLowerCase()
+    let sliceIndex = 0
+    for (let j = 0; j < cell.length; j++) {
+      if (numArr.indexOf(cell[j]) > -1) {
+        sliceIndex = j
+        break
+      }
+    }
+    const cellArr = ([cell.slice(0, sliceIndex), cell.slice(sliceIndex)])
+    if (cellArr[0].length == 0) throw Error(errorMsg)
+    for (let j = 0; j < cellArr[0].length; j++) {
+      if (letterArr.indexOf(cellArr[0][j]) == -1) throw Error(errorMsg)
+    }
+    if (cellArr[1].length == 0) throw Error(errorMsg)
+    for (let j = 0; j < cellArr[1].length; j++) {
+      if (numArr.indexOf(cellArr[1][j]) == -1) throw Error(errorMsg)
+    }
+    rangeArr.push(cellArr)
+  }
+
+  // format: let rangeArr = [["A", 12], ["BA", 18]]
+  for (let i = 0; i < rangeArr.length; i++) {
+    rangeArr[i][1] = Number(rangeArr[i][1])
+
+    let sum = 0
+    let base26Str = rangeArr[i][0].reverse()
+    for (let j = 0; j < base26Str.length; j++) {
+      sum += (letterArr.indexOf(base26Str[j]) * (26 ** j))
+    }
+    rangeArr[i][0] = sum
+  }
+
+  if (rangeArr[0][0] > rangeArr[1][0]) throw Error(`${errorMsg}: start cell's column greater than end cell's column`)
+  if (rangeArr[0][1] > rangeArr[1][1]) throw Error(`${errorMsg}: start cell's row greater than end cell's row`)
+
+  return rangeArr
+  } catch (error) {
+    alert(error)
+  }
 }
 
 async function getGroups() {
