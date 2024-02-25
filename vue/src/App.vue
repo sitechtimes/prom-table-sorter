@@ -88,17 +88,25 @@ function calcCellRange(cellRange) {
   }
 }
 
+function processRawStr(rawStr, targetArr, valuesCommaSeperated) {
+  if (valuesCommaSeperated == true) rawStr.split(',').forEach((e) => {
+    targetArr.push(e.trim())
+  })
+  else targetArr.push(rawStr.trim())
+}
+
 async function getGroups() {
   const uploadedFile = await fileInput.value.files[0].arrayBuffer()
   const importWorkbook = new ExcelJS.Workbook()
   await importWorkbook.xlsx.load(uploadedFile)
   const groupWorksheet = importWorkbook.worksheets[0]
   let allGroups = []
-  if (searchAllCells == true) {
+  const isCommaSeperated = (dataFormat.value == "single-cell-comma-seperated" ? true : false)
+  if (searchAllCells.value == true) {
     groupWorksheet.eachRow((row) => {
       let individualGroup = []
       row.eachCell((cell) => {
-        individualGroup.push(cell.value)
+        processRawStr(cell.value, individualGroup, isCommaSeperated)
       })
       allGroups.push(individualGroup)
     })
