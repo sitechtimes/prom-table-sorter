@@ -12,10 +12,9 @@ const downloadURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
 
-
 function calcCellRange(inputCellRange) {
-  const errorMsg = "Invalid Cell Coordinates Inputted"
-  const numArr = [('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')]
+  const errorMsg = 'Invalid Cell Coordinates Inputted'
+  const numArr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
   const letterArr = [
     'a',
     'b',
@@ -45,54 +44,59 @@ function calcCellRange(inputCellRange) {
     'z'
   ]
   try {
-  let rangeArr = []
-  for (let i = 0; i < inputCellRange.length; i++) {
-    const cell = inputCellRange[i].toLowerCase()
-    let sliceIndex = 0
-    for (let j = 0; j < cell.length; j++) {
-      if (numArr.indexOf(cell[j]) > -1) {
-        sliceIndex = j
-        break
+    let rangeArr = []
+    for (let i = 0; i < inputCellRange.length; i++) {
+      const cell = inputCellRange[i].toLowerCase()
+      let sliceIndex = 0
+      for (let j = 0; j < cell.length; j++) {
+        if (numArr.indexOf(cell[j]) > -1) {
+          sliceIndex = j
+          break
+        }
       }
+      const cellArr = [cell.slice(0, sliceIndex), cell.slice(sliceIndex)]
+      if (cellArr[0].length == 0) throw Error(errorMsg)
+      for (let j = 0; j < cellArr[0].length; j++) {
+        if (letterArr.indexOf(cellArr[0][j]) == -1) throw Error(errorMsg)
+      }
+      if (cellArr[1].length == 0) throw Error(errorMsg)
+      for (let j = 0; j < cellArr[1].length; j++) {
+        if (numArr.indexOf(cellArr[1][j]) == -1) throw Error(errorMsg)
+      }
+      rangeArr.push(cellArr)
     }
-    const cellArr = ([cell.slice(0, sliceIndex), cell.slice(sliceIndex)])
-    if (cellArr[0].length == 0) throw Error(errorMsg)
-    for (let j = 0; j < cellArr[0].length; j++) {
-      if (letterArr.indexOf(cellArr[0][j]) == -1) throw Error(errorMsg)
-    }
-    if (cellArr[1].length == 0) throw Error(errorMsg)
-    for (let j = 0; j < cellArr[1].length; j++) {
-      if (numArr.indexOf(cellArr[1][j]) == -1) throw Error(errorMsg)
-    }
-    rangeArr.push(cellArr)
-  }
 
-  // format: let rangeArr = [["A", 12], ["BA", 18]]
-  for (let i = 0; i < rangeArr.length; i++) {
-    rangeArr[i][1] = Number(rangeArr[i][1])
-    let sum = 0
-    const base26Str = rangeArr[i][0].reverse()
-    for (let j = 0; j < base26Str.length; j++) {
-      sum += (letterArr.indexOf(base26Str[j]) * (26 ** j))
+    // format: let rangeArr = [["A", 12], ["BA", 18]]
+    for (let i = 0; i < rangeArr.length; i++) {
+      rangeArr[i][1] = Number(rangeArr[i][1])
+      let sum = 0
+      const base26Str = rangeArr[i][0].split('').reverse()
+      for (let j = 0; j < base26Str.length; j++) {
+        sum += (letterArr.indexOf(base26Str[j]) + 1) * 26 ** j
+      }
+      rangeArr[i][0] = sum
     }
-    rangeArr[i][0] = sum
-  }
-  if (rangeArr[0][0] > rangeArr[1][0]) throw Error(`${errorMsg}: start cell's column greater than end cell's column`)
-  if (rangeArr[0][1] > rangeArr[1][1]) throw Error(`${errorMsg}: start cell's row greater than end cell's row`)
-  return rangeArr
+    if (rangeArr[0][0] > rangeArr[1][0])
+      throw Error(`${errorMsg}: start cell's column greater than end cell's column`)
+    if (rangeArr[0][1] > rangeArr[1][1])
+      throw Error(`${errorMsg}: start cell's row greater than end cell's row`)
+    return rangeArr
   } catch (error) {
     alert(error)
   }
 }
 
 function processRawStr(rawStr, targetArr, valuesCommaSeperated) {
-  if (valuesCommaSeperated == true) rawStr.split(',').forEach((e) => {
-    const processedStr = e.trim()
-    if (processedStr.length > 0) targetArr.push(processedStr)
-  })
-  else {
-    const processedStr = rawStr.trim()
-    if (processedStr.length > 0) targetArr.push(processedStr)
+  if (rawStr != null) {
+    if (valuesCommaSeperated == true)
+      rawStr.split(',').forEach((e) => {
+        const processedStr = e.trim()
+        if (processedStr.length > 0) targetArr.push(processedStr)
+      })
+    else {
+      const processedStr = rawStr.trim()
+      if (processedStr.length > 0) targetArr.push(processedStr)
+    }
   }
 }
 
@@ -102,7 +106,7 @@ async function getGroups() {
   await importWorkbook.xlsx.load(uploadedFile)
   const groupWorksheet = importWorkbook.worksheets[0]
   let allGroups = []
-  const isCommaSeperated = (dataFormat.value == "single-cell-comma-seperated")
+  const isCommaSeperated = dataFormat.value == 'single-cell-comma-seperated'
   if (searchAllCells.value == true) {
     groupWorksheet.eachRow((row) => {
       let individualGroup = []
@@ -112,11 +116,19 @@ async function getGroups() {
       allGroups.push(individualGroup)
     })
   } else {
-    const processedCellRange = calcCellRange(cellRange.value[0], cellRange.value[1]) // format: [[3, 12], [10, 18]]
-    for (let rowIndex = processedCellRange[0][1]; rowIndex <= processedCellRange[1][1]; rowIndex++) {
+    const processedCellRange = calcCellRange(cellRange.value) // format: [[3, 12], [10, 18]]
+    for (
+      let rowIndex = processedCellRange[0][1];
+      rowIndex <= processedCellRange[1][1];
+      rowIndex++
+    ) {
       const row = groupWorksheet.getRow(rowIndex)
       let individualGroup = []
-      for (let columnIndex = processedCellRange[0][0]; columnIndex <= processedCellRange[1][0]; columnIndex++) {
+      for (
+        let columnIndex = processedCellRange[0][0];
+        columnIndex <= processedCellRange[1][0];
+        columnIndex++
+      ) {
         const cell = row.getCell(columnIndex)
         processRawStr(cell.value, individualGroup, isCommaSeperated)
       }
@@ -147,7 +159,6 @@ async function exportResultsAsXLSX() {
     table.occupants.forEach((group) => {
       for (let i = 0; i < group.length; i++) {
         const cell = row.getCell(cellIndex + i)
-        console.log(cell, cellIndex)
         cell.value = group[i].name
         if (group[i].name == 'guest name') {
           cell.fill = {
