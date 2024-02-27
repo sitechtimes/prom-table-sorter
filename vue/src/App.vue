@@ -135,7 +135,6 @@ async function getGroups() {
       allGroups.push(individualGroup)
     }
   }
-
   return allGroups
 }
 
@@ -187,7 +186,7 @@ async function exportResultsAsXLSX() {
 <template>
   <h1>Prom Table Sorting App</h1>
   <br />
-  <form>
+  <div>
     <label for="input-groups">Upload Group Excel File: </label>
 
     <input type="file" name="input-groups" ref="fileInput" accept=".xlsx" required />
@@ -278,7 +277,7 @@ async function exportResultsAsXLSX() {
     <input v-model="maxSeats" type="number" name="max-seats" min="1" step="1" required />
     <br />
     <button @click="executeSort">Sort</button>
-  </form>
+  </div>
 
   <br />
   <br />
