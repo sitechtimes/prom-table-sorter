@@ -42,6 +42,14 @@ function arrayLen2D(list2D) {
   return sum
 }
 
+function getTopSort(arr, sortFunc) {
+  currentTopIndex = 0
+  for (let i = 1; i < arr.length; i++) {
+    if (sortFunc(arr[i], arr[currentTopIndex]) < 0) currentTopIndex = i
+  }
+  return currentTopIndex
+}
+
 function sortTableSeats(groups, tables, groupSortFunc, tableSortFunc) {
   let tableObjs = []
   tables.forEach((table) => {
@@ -51,14 +59,13 @@ function sortTableSeats(groups, tables, groupSortFunc, tableSortFunc) {
       occupants: []
     })
   })
-  tableObjs.sort(tableSortFunc)
   groups.sort(groupSortFunc)
 
   for (let i = 0; i < groups.length; i++) {
-    if (tableObjs[0].unoccupiedSeats >= groups[i].length) {
-      tableObjs[0].occupants.push(groups[i])
-      tableObjs[0].unoccupiedSeats -= groups[i].length
-      tableObjs.sort(tableSortFunc)
+    topTableIndex = getTopSort(tableObjs, tableSortFunc)
+    if (tableObjs[topTableIndex].unoccupiedSeats >= groups[i].length) {
+      tableObjs[topTableIndex].occupants.push(groups[i])
+      tableObjs[topTableIndex].unoccupiedSeats -= groups[i].length
     } else {
       // console.log("table configuration doesn't fit, moving to next algorithm");
       return null
