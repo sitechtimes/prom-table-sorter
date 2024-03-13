@@ -43,7 +43,7 @@ function arrayLen2D(list2D) {
 }
 
 function getTopSort(arr, sortFunc) {
-  currentTopIndex = 0
+  let currentTopIndex = 0
   for (let i = 1; i < arr.length; i++) {
     if (sortFunc(arr[i], arr[currentTopIndex]) < 0) currentTopIndex = i
   }
@@ -62,7 +62,11 @@ function sortTableSeats(groups, tables, groupSortFunc, tableSortFunc) {
   groups.sort(groupSortFunc)
 
   for (let i = 0; i < groups.length; i++) {
-    topTableIndex = getTopSort(tableObjs, tableSortFunc)
+    const topTableIndex = getTopSort(tableObjs, tableSortFunc)
+    /* console.log(
+      tableObjs[topTableIndex].unoccupiedSeats ==
+        tableObjs.toSorted(tableSortFunc)[0].unoccupiedSeats
+    ) */
     if (tableObjs[topTableIndex].unoccupiedSeats >= groups[i].length) {
       tableObjs[topTableIndex].occupants.push(groups[i])
       tableObjs[topTableIndex].unoccupiedSeats -= groups[i].length

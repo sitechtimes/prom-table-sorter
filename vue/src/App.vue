@@ -140,7 +140,7 @@ async function getGroups() {
 
 async function executeSort() {
   const guestGroups = await getGroups()
-  console.log(guestGroups)
+  // console.log(guestGroups)
   try {
     sortedTables.value = rangeSort(guestGroups, algoFunctionOptions, maxSeats.value, minSeats.value)
   } catch (error) {
