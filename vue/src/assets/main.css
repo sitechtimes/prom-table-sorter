@@ -1,0 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Noto+Serif+HK:wght@200..900&family=Pathway+Extreme&display=swap');
+
+:root {
+  --background: #f5f4ed;
+  --text: #282f44;
+  --frame: #8686bf;
+  --btn: #5f5e94;
+  --highlight: #f7eabb;
+  --error: #f7bbbb;
+
+  --font-bold: 'Jost', san serif;
+  --font-heading: 'Noto Serif', serif;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  background: var(--background);
+  color: var(--text);
+}
+#app {
+  display: flex;
+}
+.Ldiv {
+  width: 40vw;
+  border: #bec5dc 4px solid;
+  margin: 28px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+}
+.Rdiv {
+  width: 45vw;
+  border: #bec5dc 4px solid;
+  margin: 28px;
+  padding: 30px;
+  height: 85vh;
+  overflow-y: scroll;
+}
+#tables {
+  display: flex;
+  flex-wrap: wrap;
+}
+.btn {
+  background-color: var(--btn);
+  color: var(--background);
+  border-radius: 10px;
+  font-style:
+    'Jost',
+    san serif;
+  font-weight: 600;
+  font-stretch: expanded;
+  text-align: center;
+  width: 142px;
+  height: 34px;
+}
+#sortBtn {
+  padding: 20px;
+  width: 200px;
+  height: 81px;
+  font-size: 48px;
+  margin: auto;
+  margin-top: 50px;
+}
+h1 {
+  font-size: 80px;
+  margin: 0;
+}
+h2 {
+  font-size: 64px;
+  margin: 0;
+}
+label {
+  font-size: 24px;
+}
+.rangeContainerMinmax {
+  display: flex;
+  justify-content: space-around;
+  width: 25vw;
+  align-items: center;
+}
+.rangeContainerFromto {
+  display: flex;
+  justify-content: space-around;
+  width: 20vw;
+  align-items: center;
+}
+.fileUpload {
+  display: flex;
+  align-items: center;
+}
+.table {
+  background-color: var(--frame);
+  width: 45%;
+  margin: 0.5rem;
+}
+.groupsInTable {
+  display: flex;
+}
+.searchAllCells {
+  display: flex;
+  align-items: end;
+}
+.dataFormatContainer {
+  display: flex;
+  align-items: stretch;
+  padding: 10px;
+}
+.uploadBtn {
+  cursor: pointer;
+  margin: 10px;
+  font-style:
+    'Jost',
+    san serif;
+}
+#upload-file {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
+#navBar {
+  display: flex;
+  flex-direction: row;
+}
+.group {
+  padding: 0.5rem;
+  margin: 0.5rem;
+  background-color: var(--background);
+  flex-grow: 1;
+  width: 45%;
+  height: auto;
+}
+
+.person {
+  padding: 0.5rem;
+  margin: 0.5rem;
+  flex-grow: 1;
+}
+
+.input-text {
+  border: var(--frame) 2px solid;
+  background: rgb(55, 43, 105);
+  background: linear-gradient(
+    180deg,
+    rgba(55, 43, 105, 0.123) 0%,
+    rgba(46, 56, 128, 0) 29%,
+    rgba(0, 212, 255, 0) 100%
+  );
+  width: 83px;
+  height: 34px;
+}
+.containerCheck input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+.containerCheck {
+  cursor: pointer;
+}
+.checkbox {
+  border: var(--frame) 2px solid;
+  background-color: rgb(55, 43, 105);
+  background: linear-gradient(
+    180deg,
+    rgba(55, 43, 105, 0.123) 0%,
+    rgba(46, 56, 128, 0) 29%,
+    rgba(0, 212, 255, 0) 100%
+  );
+  appearance: none;
+  width: 29px;
+  height: 29px;
+  border: 2px solid var(--frame);
+  transition: 0.1s all linear;
+  margin-right: 5px;
+  position: relative;
+  top: 4px;
+}
+.checkbox:checked {
+  border: 10px solid var(--btn);
+}
+.checkbox:hover {
+  cursor: pointer;
+}
+.text {
+  color: var(--text);
+}
+
+.input-note {
+  font-style: italic;
+}
+
+.btn-link {
+  font: 12.5px Arial;
+  text-decoration: none;
+  background-color: #e9e9ed;
+  color: #000000;
+  padding: 5px;
+  border: 1px solid #8f8f9d;
+  border-radius: 4.5px;
+}
+.btn-link:hover {
+  background-color: #d0d0d7;
+  border-color: #676774;
+}
+
+.btn-link:active {
+  background-color: #b1b1b9;
+  border-color: #484851;
+}
+
+.duplicate mark {
+  background-color: #f5ca50;
+}
+
+.unnamed mark {
+  background-color: #f55050;
+}
+.disabled {
+  opacity: 60%;
+}
