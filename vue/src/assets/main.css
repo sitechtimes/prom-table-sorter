@@ -31,6 +31,7 @@ body {
   padding: 30px;
   display: flex;
   flex-direction: column;
+  font-family: var(--font-bold);
 }
 .form {
   display: flex;
@@ -43,6 +44,7 @@ body {
   padding: 30px;
   height: 85vh;
   overflow-y: scroll;
+  font-family: var(--font-bold);
 }
 #tables {
   display: flex;
@@ -52,9 +54,7 @@ body {
   background-color: var(--btn);
   color: var(--background);
   border-radius: 10px;
-  font-style:
-    'Jost',
-    san serif;
+  font-family: var(--font-bold);
   font-weight: 600;
   font-stretch: expanded;
   text-align: center;
@@ -62,7 +62,6 @@ body {
   height: 34px;
 }
 #sortBtn {
-  padding: 20px;
   width: 200px;
   height: 81px;
   font-size: 48px;
@@ -70,11 +69,18 @@ body {
   margin-top: 50px;
 }
 h1 {
+  font-family: var(--font-heading);
   font-size: 80px;
   margin: 0;
 }
 h2 {
   font-size: 64px;
+  margin: 0;
+}
+h3 {
+  margin: 7px;
+}
+h4 {
   margin: 0;
 }
 label {

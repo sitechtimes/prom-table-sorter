@@ -201,7 +201,9 @@ async function exportResultsAsXLSX() {
             required
           />
         </div>
-        <label class="" for="input-groups">Each row must be a separate group.</label>
+        <label class="dataFormatContainer" for="input-groups"
+          >Each row must be a separate group.</label
+        >
         <label for="data-format"><h3>2. Select data file format:</h3></label>
         <div class="dataFormatContainer">
           <input
@@ -315,7 +317,7 @@ async function exportResultsAsXLSX() {
             required
           />
         </div>
-        <button @click="executeSort" class="btn" id="sortBtn">Sort</button>
+        <button @click="executeSort" class="btn" id="sortBtn"><h4>Sort</h4></button>
       </div>
     </div>
 
