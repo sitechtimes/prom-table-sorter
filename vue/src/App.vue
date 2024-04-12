@@ -11,6 +11,7 @@ const fileInput = ref(null)
 const downloadURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
+let showKey = ref(false)
 
 function calcCellRange(inputCellRange) {
   const errorMsg = 'Invalid Cell Coordinates Inputted'
@@ -181,6 +182,11 @@ async function exportResultsAsXLSX() {
   const blob = new Blob([buffer], { type: fileType })
   downloadURL.value = URL.createObjectURL(blob)
 }
+
+function toggleKey() {
+  let showKey = true
+  console.log('showkey=' + showKey)
+}
 </script>
 
 <template>
@@ -202,7 +208,7 @@ async function exportResultsAsXLSX() {
           />
         </div>
         <label class="dataFormatContainer" for="input-groups"
-          >Each row must be a separate group.</label
+          >• Each row must be a separate group.</label
         >
         <label for="data-format"><h3>2. Select data file format:</h3></label>
         <div class="dataFormatContainer">
@@ -233,8 +239,11 @@ async function exportResultsAsXLSX() {
             <span class="input-note">(Google Sheets)</span></label
           >
         </div>
-        <label for="cell-range"><h3>2. Select data file format:</h3></label>
-        <div>
+        <label class="dataFormatContainer" for=""
+          >• Several names in one cell must be separated by a comma</label
+        >
+        <label for="cell-range"><h3>3. Select data file format:</h3></label>
+        <div class="containerSearchCells">
           <div v-if="searchAllCells" class="disabled rangeContainerFromto">
             <input
               disabled
@@ -320,18 +329,32 @@ async function exportResultsAsXLSX() {
         <button @click="executeSort" class="btn" id="sortBtn"><h4>Sort</h4></button>
       </div>
     </div>
-
+    <div v-if="showKey" class="key">
+      <h3 id="keyH3">KEY:</h3>
+      <div class="childKey">
+        <h4 id="yellowH4">Yellow Highlights:</h4>
+        <p class="plainTextKey">Represent duplicate students.</p>
+        <h4 id="redH4">Red Highlights:</h4>
+        <p class="plainTextKey">Represent empty slots.</p>
+      </div>
+    </div>
     <div class="Rdiv">
       <div id="navBar">
         <h2>Generated Tables</h2>
+        <div class="btn keyBtn"><button @click="showKey = !showKey">Key</button></div>
         <div v-if="sortedTables != null">
           <a v-if="downloadURL == null" disabled class="btn">Loading...</a>
-          <a v-else :href="downloadURL" class="btn">Download Sorted Tables</a>
+          <a v-else :href="downloadURL" class="downloadBtn btn">Download Sorted Tables</a>
         </div>
       </div>
       <div id="tables">
         <div class="table" v-for="table in sortedTables">
-          <p class="text">{{ arrayLen2D(table.occupants) }}/{{ table.capacity }} Seats Occupied</p>
+          <div class="tableHeaderContainer">
+            <h3 class="tableHeader">Table {{ table.index }}</h3>
+            <h4 class="text occupiedSeats">
+              {{ arrayLen2D(table.occupants) }}/{{ table.capacity }} Seats Occupied
+            </h4>
+          </div>
           <div class="groupsInTable">
             <div class="group" v-for="group in table.occupants">
               <div v-for="person in group">
