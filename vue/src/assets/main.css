@@ -24,33 +24,6 @@ body {
 #app {
   display: flex;
 }
-.Ldiv {
-  width: 40vw;
-  border: #bec5dc 4px solid;
-  margin: 28px;
-  padding: 30px;
-  display: flex;
-  flex-direction: column;
-  font-family: var(--font-bold);
-}
-.form {
-  display: flex;
-  flex-direction: column;
-}
-.Rdiv {
-  width: 45vw;
-  border: #bec5dc 4px solid;
-  margin: 28px;
-  padding: 30px;
-  height: 85vh;
-  overflow-y: scroll;
-  font-family: var(--font-bold);
-}
-#tables {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
 .btn {
   background-color: var(--btn);
   color: var(--background);
@@ -61,13 +34,6 @@ body {
   text-align: center;
   width: 142px;
   height: 34px;
-}
-#sortBtn {
-  width: 200px;
-  height: 81px;
-  font-size: 48px;
-  margin: auto;
-  margin-top: 50px;
 }
 h1 {
   font-family: var(--font-bold);
@@ -87,6 +53,12 @@ h3 {
 h4 {
   margin: 0;
 }
+h5 {
+  margin: 0;
+  font-family: var(--font-bold);
+  font-size: 20px;
+  font-weight: 500;
+}
 label {
   font-size: 24px;
 }
@@ -99,7 +71,6 @@ label {
   color: var(--text);
   padding: 30px;
   width: 30vw;
-  height: 50vh;
   border-radius: 30px;
   background-color: var(--background);
   border: var(--btn) solid 5px;
@@ -112,20 +83,7 @@ label {
   font-size: 80px;
   font-weight: 500;
 }
-#yellowH4 {
-  background-color: var(--highlight);
-  width: fit-content;
-  margin: 10px 0;
-  padding: 7px;
-  font-weight: 400;
-}
-#redH4 {
-  background-color: var(--error);
-  margin: 10px 0;
-  width: fit-content;
-  padding: 7px;
-  font-weight: 400;
-}
+
 .plainTextKey {
   margin: 0;
 }
@@ -135,69 +93,7 @@ label {
   margin-top: 0;
   font-size: 36px;
 }
-.rangeContainerMinmax {
-  display: flex;
-  justify-content: space-around;
-  width: 25vw;
-  align-items: center;
-}
-.rangeContainerFromto {
-  display: flex;
-  justify-content: space-around;
-  width: 20vw;
-  align-items: center;
-}
-.fileUpload {
-  display: flex;
-  align-items: center;
-}
-.table {
-  background-color: var(--frame);
-  width: 45%;
-  margin: 0.5rem;
-}
-.tableHeader {
-  font-size: 24px;
-}
-.tableHeaderContainer {
-  color: var(--background);
-  display: flex;
-  justify-content: space-between;
-  text-align: center;
-}
-.occupiedSeats {
-  color: var(--background);
-  margin: 13px;
-}
-.downloadBtn {
-  padding: 13px;
-  font-size: 20px;
-  text-decoration: none;
-  height: 56px;
-}
-.groupsInTable {
-  display: flex;
-}
-.searchAllCells {
-  display: flex;
-  text-align: center;
-  padding: 10px;
-}
-.dataFormatContainer {
-  display: flex;
-  align-items: stretch;
-  padding: 10px;
-}
-.containerSearchCells {
-  padding: 10px;
-}
-.uploadBtn {
-  cursor: pointer;
-  margin: 10px;
-  font-style:
-    'Jost',
-    san serif;
-}
+
 button {
   all: unset;
   text-align: center;
@@ -210,108 +106,4 @@ button {
   height: 56px;
   padding: 0 13px;
   font-size: 20px;
-}
-#upload-file {
-  opacity: 0;
-  position: absolute;
-  z-index: -1;
-}
-#navBar {
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  align-items: center;
-}
-.group {
-  padding: 0.5rem;
-  margin: 0.5rem;
-  background-color: var(--background);
-  flex-grow: 1;
-  width: 45%;
-  height: auto;
-}
-
-.person {
-  padding: 0.5rem;
-  margin: 0.5rem;
-  flex-grow: 1;
-}
-
-.input-text {
-  border: var(--frame) 2px solid;
-  background: rgb(55, 43, 105);
-  background: linear-gradient(
-    180deg,
-    rgba(55, 43, 105, 0.123) 0%,
-    rgba(46, 56, 128, 0) 29%,
-    rgba(0, 212, 255, 0) 100%
-  );
-  width: 83px;
-  height: 34px;
-}
-.containerCheck input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-}
-.containerCheck {
-  cursor: pointer;
-}
-.checkbox {
-  border: var(--frame) 2px solid;
-  background-color: rgb(55, 43, 105);
-  background: linear-gradient(
-    180deg,
-    rgba(55, 43, 105, 0.123) 0%,
-    rgba(46, 56, 128, 0) 29%,
-    rgba(0, 212, 255, 0) 100%
-  );
-  appearance: none;
-  width: 29px;
-  height: 29px;
-  border: 2px solid var(--frame);
-  transition: 0.1s all linear;
-  margin-right: 5px;
-  position: relative;
-  top: 4px;
-}
-.checkbox:checked {
-  border: 10px solid var(--btn);
-}
-.checkbox:hover {
-  cursor: pointer;
-}
-
-.input-note {
-  font-style: italic;
-}
-
-.btn-link {
-  font: 12.5px Arial;
-  text-decoration: none;
-  background-color: #e9e9ed;
-  color: #000000;
-  padding: 5px;
-  border: 1px solid #8f8f9d;
-  border-radius: 4.5px;
-}
-.btn-link:hover {
-  background-color: #d0d0d7;
-  border-color: #676774;
-}
-
-.btn-link:active {
-  background-color: #b1b1b9;
-  border-color: #484851;
-}
-
-.duplicate mark {
-  background-color: var(--highlight);
-}
-
-.unnamed mark {
-  background-color: var(--error);
-}
-.disabled {
-  opacity: 60%;
 }

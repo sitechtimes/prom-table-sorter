@@ -1,0 +1,143 @@
+.Ldiv {
+  width: 40vw;
+  border: #bec5dc 4px solid;
+  margin: 28px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-bold);
+}
+.form {
+  display: flex;
+  flex-direction: column;
+}
+#sortBtn {
+  cursor: pointer;
+  width: 200px;
+  height: 81px;
+  font-size: 48px;
+  margin: auto;
+  margin-top: 50px;
+}
+.rangeContainerMinmax {
+  display: flex;
+  justify-content: space-around;
+  width: 25vw;
+  align-items: center;
+}
+.rangeContainerFromto {
+  display: flex;
+  justify-content: space-around;
+  width: 20vw;
+  align-items: center;
+}
+.fileUpload {
+  display: flex;
+  align-items: center;
+}
+.searchAllCells {
+  display: flex;
+  text-align: center;
+  padding: 10px;
+}
+.dataFormatContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+}
+.containerSearchCells {
+  padding: 10px;
+}
+.uploadBtn {
+  cursor: pointer;
+  margin: 10px;
+  font-style:
+    'Jost',
+    san serif;
+}
+
+/* #upload-file {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+} */
+.input-text {
+  border: var(--frame) 2px solid;
+  background: rgb(55, 43, 105);
+  background: linear-gradient(
+    180deg,
+    rgba(55, 43, 105, 0.123) 0%,
+    rgba(46, 56, 128, 0) 29%,
+    rgba(0, 212, 255, 0) 100%
+  );
+  width: 83px;
+  height: 34px;
+}
+.containerCheck input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+.containerCheck {
+  cursor: pointer;
+}
+.checkbox {
+  border: var(--frame) 2px solid;
+  background-color: rgb(55, 43, 105);
+  background: linear-gradient(
+    180deg,
+    rgba(55, 43, 105, 0.123) 0%,
+    rgba(46, 56, 128, 0) 29%,
+    rgba(0, 212, 255, 0) 100%
+  );
+  appearance: none;
+  width: 29px;
+  height: 29px;
+  border: 2px solid var(--frame);
+  transition: 0.1s all linear;
+  margin:;
+  margin-right: 5px;
+  position: relative;
+  top: 4px;
+}
+.checkbox:checked {
+  border: 10px solid var(--btn);
+}
+.checkbox:hover {
+  cursor: pointer;
+}
+
+.input-note {
+  font-style: italic;
+}
+
+.btn-link {
+  font: 12.5px Arial;
+  text-decoration: none;
+  background-color: #e9e9ed;
+  color: #000000;
+  padding: 5px;
+  border: 1px solid #8f8f9d;
+  border-radius: 4.5px;
+}
+.btn-link:hover {
+  background-color: #d0d0d7;
+  border-color: #676774;
+}
+
+.btn-link:active {
+  background-color: #b1b1b9;
+  border-color: #484851;
+}
+
+.duplicate mark {
+  background-color: var(--highlight);
+}
+
+.unnamed mark {
+  background-color: var(--error);
+}
+.disabled {
+  opacity: 60%;
+}

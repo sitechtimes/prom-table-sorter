@@ -196,7 +196,7 @@ function toggleKey() {
       <div class="form">
         <div class="fileUpload">
           <label for="input-groups"><h3>1. Upload group excel file:</h3></label>
-          <label class="uploadBtn btn" for="upload-file">Upload</label>
+          <div class="uploadBtn btn" for="upload-file">Upload</div>
           <input
             id="upload-file"
             class="btn"
@@ -206,6 +206,7 @@ function toggleKey() {
             accept=".xlsx"
             required
           />
+          <label for="input-groups"> Uploaded file {{ fileInput.data }}</label>
         </div>
         <label class="dataFormatContainer" for="input-groups"
           >• Each row must be a separate group.</label
@@ -332,6 +333,7 @@ function toggleKey() {
     <div v-if="showKey" class="key">
       <h3 id="keyH3">KEY:</h3>
       <div class="childKey">
+        <h5>* Each white box represents an individual group.</h5>
         <h4 id="yellowH4">Yellow Highlights:</h4>
         <p class="plainTextKey">Represent duplicate students.</p>
         <h4 id="redH4">Red Highlights:</h4>
@@ -341,7 +343,7 @@ function toggleKey() {
     <div class="Rdiv">
       <div id="navBar">
         <h2>Generated Tables</h2>
-        <div class="btn keyBtn"><button @click="showKey = !showKey">Key</button></div>
+        <div class="btn keyBtn" @click="showKey = !showKey"><button>Key</button></div>
         <div v-if="sortedTables != null">
           <a v-if="downloadURL == null" disabled class="btn">Loading...</a>
           <a v-else :href="downloadURL" class="downloadBtn btn">Download Sorted Tables</a>
@@ -376,4 +378,6 @@ function toggleKey() {
 
 <style scoped>
 @import url(./assets/main.css);
+@import url(./assets/leftSide.css);
+@import url(./assets/rightSide.css);
 </style>
