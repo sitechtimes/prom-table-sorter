@@ -211,6 +211,12 @@ async function exportResultsAsXLSX() {
       <span class="input-note">(Google Sheets)</span></label
     >
     <br />
+    <input v-model="dataFormat" type="radio" id="group-id-column" value="sgroup-id-column" />
+    <label for="group-id-column"
+      >In each row, one cell has the person's name and one cell has the of the group they're in
+      <span class="input-note">(Google Form | Google Sheet)</span></label
+    >
+    <br />
     <br />
     <div v-if="searchAllCells" class="disabled">
       <label for="cell-range">Cell Range: </label>
