@@ -196,7 +196,7 @@ function toggleKey() {
       <div class="form">
         <div class="fileUpload">
           <label for="input-groups"><h3>1. Upload group excel file:</h3></label>
-          <div class="uploadBtn btn" for="upload-file">Upload</div>
+          <label class="uploadBtn btn" for="upload-file">Upload</label>
           <input
             id="upload-file"
             class="btn"
@@ -206,7 +206,6 @@ function toggleKey() {
             accept=".xlsx"
             required
           />
-          <label for="input-groups"> Uploaded file {{ fileInput.data }}</label>
         </div>
         <label class="dataFormatContainer" for="input-groups"
           >• Each row must be a separate group.</label
