@@ -64,9 +64,9 @@ function sortTableSeats(groups, tables, groupSortFunc, tableSortFunc) {
   for (let i = 0; i < groups.length; i++) {
     const topTableIndex = getTopSort(tableObjs, tableSortFunc)
     /* console.log(
-      tableObjs[topTableIndex].unoccupiedSeats ==
-        tableObjs.toSorted(tableSortFunc)[0].unoccupiedSeats
-    ) */
+        tableObjs[topTableIndex].unoccupiedSeats ==
+          tableObjs.toSorted(tableSortFunc)[0].unoccupiedSeats
+      ) */
     if (tableObjs[topTableIndex].unoccupiedSeats >= groups[i].length) {
       tableObjs[topTableIndex].occupants.push(groups[i])
       tableObjs[topTableIndex].unoccupiedSeats -= groups[i].length
@@ -103,8 +103,8 @@ function checkInputValidity(
 
 function tagDuplicates(checkGroupArr) {
   /*   for (let x = 0; x < checkGroupArr.length; x++) {
-    for (let y = 0; y < checkGroupArr[x].length; y++) {}
-  } */
+      for (let y = 0; y < checkGroupArr[x].length; y++) {}
+    } */
   let newGroupArr = []
   checkGroupArr.forEach((targetGroup) => {
     let newGroup = []
@@ -138,9 +138,9 @@ function mainSort(mainGroups, mainTables, algoOptions) {
       algoOptions.findIndex((e) => e.name == 'Largest Groups --> Largest Tables (First)')
     ],
     `ERROR:
-      Too few tables: there are {tableSum} total table seats, but {guestSum} guests. Try increasing the number of tables.`,
+        Too few tables: there are {tableSum} total table seats, but {guestSum} guests. Try increasing the number of tables.`,
     `ERROR:
-      Tables too small: the largest table has {tableSeats} seats, but the largest group has {groupGuests} guests. Try increasing the number of table seats.`
+        Tables too small: the largest table has {tableSeats} seats, but the largest group has {groupGuests} guests. Try increasing the number of table seats.`
   )
 
   const groupObjArr = tagDuplicates(mainGroups)

@@ -1,29 +1,29 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'Home',
-      component: () => import('../views/HomeView.vue')
+      name: 'home',
+      component: HomeView
     },
     {
-      path: '/name/:spreadsheetArray',
-      name: 'Upload Data',
+      path: '/old', // remove before production
+      name: 'old home view',
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/UploadData.vue'),
-      props: true
+      component: () => import('../views/OldHomeView.vue')
     },
     {
-      path: '/confirmation/:orderedItem/:customerName',
-      name: 'Order Received',
+      path: '/import-settings/:spreadsheetData+',
+      name: 'Import Settings',
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/OrderReceived.vue'),
+      component: () => import('../views/ImportSettingsView.vue'),
       props: true
     }
   ]
