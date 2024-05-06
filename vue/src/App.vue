@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import ExcelJS from 'exceljs'
 import { rangeSort, algoFunctionOptions, arrayLen2D } from './sortingAlgo.js'
+import key from './components/key.vue'
 
 const sortedTables = ref(null)
 const minSeats = ref(null)
@@ -12,6 +13,8 @@ const downloadURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
 let showKey = ref(false)
+let showExample1 = ref(false)
+let showExample2 = ref(false)
 
 function calcCellRange(inputCellRange) {
   const errorMsg = 'Invalid Cell Coordinates Inputted'
@@ -192,6 +195,8 @@ function toggleKey() {
 <template>
   <div id="app">
     <div class="Ldiv">
+      <div v-if="showExample1" class="example1">hi hi hi</div>
+      <div v-if="showExample2" class="example2"></div>
       <h1>Prom Sorter</h1>
       <div class="form">
         <div class="fileUpload">
@@ -224,6 +229,7 @@ function toggleKey() {
           <label class="containerCheck" for="rows-columns"
             >Each row has one person's name in each cell</label
           >
+          <h3 class="example btn" @click="showExample1 = !showExample1"><i>Example</i></h3>
         </div>
         <div class="dataFormatContainer">
           <input
@@ -233,11 +239,10 @@ function toggleKey() {
             id="single-cell-comma-seperated"
             value="single-cell-comma-seperated"
           />
-
           <label class="containerCheck" for="single-cell-comma-seperated"
             >One cell per row has all of a group's names in it
-            <span class="input-note">(Google Sheets)</span></label
-          >
+          </label>
+          <h3 class="example btn" @click="showExample2 = !showExample2"><i>Example</i></h3>
         </div>
         <label class="dataFormatContainer" for=""
           >• Several names in one cell must be separated by a comma</label
@@ -329,16 +334,7 @@ function toggleKey() {
         <button @click="executeSort" class="btn" id="sortBtn"><h4>Sort</h4></button>
       </div>
     </div>
-    <div v-if="showKey" class="key">
-      <h3 id="keyH3">KEY:</h3>
-      <div class="childKey">
-        <h5>* Each white box represents an individual group.</h5>
-        <h4 id="yellowH4">Yellow Highlights:</h4>
-        <p class="plainTextKey">Represent duplicate students.</p>
-        <h4 id="redH4">Red Highlights:</h4>
-        <p class="plainTextKey">Represent empty slots.</p>
-      </div>
-    </div>
+    <key v-if="showKey" class="key"></key>
     <div class="Rdiv">
       <div id="navBar">
         <h2>Generated Tables</h2>

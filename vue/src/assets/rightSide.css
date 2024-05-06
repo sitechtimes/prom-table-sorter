@@ -13,21 +13,6 @@
   justify-content: space-between;
 }
 
-#yellowH4 {
-  background-color: var(--highlight);
-  width: fit-content;
-  margin: 10px 0;
-  padding: 7px;
-  font-weight: 400;
-}
-#redH4 {
-  background-color: var(--error);
-  margin: 10px 0;
-  width: fit-content;
-  padding: 7px;
-  font-weight: 400;
-}
-
 .table {
   background-color: var(--frame);
   width: 45%;

@@ -13,6 +13,7 @@
 }
 
 #sortBtn {
+  cursor: pointer;
   width: 200px;
   height: 81px;
   font-size: 48px;
@@ -141,4 +142,11 @@
 }
 .disabled {
   opacity: 60%;
+}
+.example {
+  float: right;
+  font-size: 23px;
+  font-weight: 400;
+  cursor: pointer;
+  margin-left: 10px;
 }
