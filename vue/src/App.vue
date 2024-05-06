@@ -10,6 +10,10 @@ const dataFormat = ref(null)
 const fileInput = ref(null)
 const downloadURL = ref(null)
 const cellRange = ref([null, null])
+const doubleColumnCellRange = ref([
+  [null, null],
+  [null, null]
+])
 const searchAllCells = ref(false)
 
 function calcCellRange(inputCellRange) {
@@ -115,7 +119,9 @@ async function getGroups() {
       })
       allGroups.push(individualGroup)
     })
-  } else {
+  } /*else if (searchAllCells.value == 'group-id-column') {
+    groupWorksheet 
+  }*/ else {
     const processedCellRange = calcCellRange(cellRange.value) // format: [[3, 12], [10, 18]]
     for (
       let rowIndex = processedCellRange[0][1];
@@ -211,70 +217,118 @@ async function exportResultsAsXLSX() {
       <span class="input-note">(Google Sheets)</span></label
     >
     <br />
-    <input v-model="dataFormat" type="radio" id="group-id-column" value="sgroup-id-column" />
+    <input v-model="dataFormat" type="radio" id="group-id-column" value="group-id-column" />
     <label for="group-id-column"
       >In each row, one cell has the person's name and one cell has the of the group they're in
-      <span class="input-note">(Google Form | Google Sheet)</span></label
+      <span class="input-note">(Google Form + Google Sheet)</span></label
     >
     <br />
     <br />
-    <div v-if="searchAllCells" class="disabled">
-      <label for="cell-range">Cell Range: </label>
+    <div v-if="dataFormat == 'group-id-column'">
+      <label for="name-cell-range">Name Column Cell Range: </label>
       <input
-        disabled
-        v-model="cellRange[0]"
+        v-model="doubleColumnCellRange[0][0]"
         type="text"
         size="4"
         minlength="2"
-        name="cell-range"
-        id="cell-range"
-        required
-      />
-      :
-      <input
-        disabled
-        v-model="cellRange[1]"
-        type="text"
-        size="4"
-        minlength="2"
-        name="cell-range"
-        id="cell-range"
-        required
-      />
-    </div>
-    <div v-else>
-      <label for="cell-range">Cell Range: </label>
-      <input
-        v-model="cellRange[0]"
-        type="text"
-        size="4"
-        minlength="2"
-        name="cell-range"
-        id="cell-range"
+        name="name-cell-range"
+        id="name-cell-range"
         required
         placeholder="A1"
       />
       :
       <input
-        v-model="cellRange[1]"
+        v-model="doubleColumnCellRange[0][1]"
         type="text"
         size="4"
         minlength="2"
-        name="cell-range"
-        id="cell-range"
+        name="name-cell-range"
+        id="name-cell-range"
         required
-        placeholder="B2"
+        placeholder="A3"
+      />
+      <br />
+      <label for="id-cell-range">Group ID Column Cell Range: </label>
+      <input
+        v-model="doubleColumnCellRange[1][0]"
+        type="text"
+        size="4"
+        minlength="2"
+        name="id-cell-range"
+        id="id-cell-range"
+        required
+        placeholder="C1"
+      />
+      :
+      <input
+        v-model="doubleColumnCellRange[1][1]"
+        type="text"
+        size="4"
+        minlength="2"
+        name="id-cell-range"
+        id="id-cell-range"
+        required
+        placeholder="C3"
       />
     </div>
-    <input
-      type="checkbox"
-      name="search-all-cells"
-      id="search-all-cells"
-      v-model="searchAllCells"
-      minlength="5"
-    />
-    <label for="search-all-cells">Search All Cells</label>
-    <br />
+    <div v-else>
+      <div v-if="searchAllCells" class="disabled">
+        <label for="cell-range">Cell Range: </label>
+        <input
+          disabled
+          v-model="cellRange[0]"
+          type="text"
+          size="4"
+          minlength="2"
+          name="cell-range"
+          id="cell-range"
+          required
+        />
+        :
+        <input
+          disabled
+          v-model="cellRange[1]"
+          type="text"
+          size="4"
+          minlength="2"
+          name="cell-range"
+          id="cell-range"
+          required
+        />
+      </div>
+      <div v-else>
+        <label for="cell-range">Cell Range: </label>
+        <input
+          v-model="cellRange[0]"
+          type="text"
+          size="4"
+          minlength="2"
+          name="cell-range"
+          id="cell-range"
+          required
+          placeholder="A1"
+        />
+        :
+        <input
+          v-model="cellRange[1]"
+          type="text"
+          size="4"
+          minlength="2"
+          name="cell-range"
+          id="cell-range"
+          required
+          placeholder="B2"
+        />
+      </div>
+      <input
+        type="checkbox"
+        name="search-all-cells"
+        id="search-all-cells"
+        v-model="searchAllCells"
+        minlength="5"
+      />
+      <label for="search-all-cells">Search All Cells</label>
+    </div>
     <br />
     <label for="min-seats">Minimum Number of Seats per Table: </label>
     <input v-model="minSeats" type="number" name="min-seats" min="0" step="1" required />
