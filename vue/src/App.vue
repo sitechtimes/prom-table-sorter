@@ -105,43 +105,112 @@ function processRawStr(rawStr, targetArr, valuesCommaSeperated) {
 }
 
 async function getGroups() {
-  const uploadedFile = await fileInput.value.files[0].arrayBuffer()
-  const importWorkbook = new ExcelJS.Workbook()
-  await importWorkbook.xlsx.load(uploadedFile)
-  const groupWorksheet = importWorkbook.worksheets[0]
-  let allGroups = []
-  const isCommaSeperated = dataFormat.value == 'single-cell-comma-seperated'
-  if (searchAllCells.value == true) {
-    groupWorksheet.eachRow((row) => {
-      let individualGroup = []
-      row.eachCell((cell) => {
-        processRawStr(cell.value, individualGroup, isCommaSeperated)
+  try {
+    const uploadedFile = await fileInput.value.files[0].arrayBuffer()
+    const importWorkbook = new ExcelJS.Workbook()
+    await importWorkbook.xlsx.load(uploadedFile)
+    const groupWorksheet = importWorkbook.worksheets[0]
+    let allGroups = []
+    const isCommaSeperated = dataFormat.value == 'single-cell-comma-seperated'
+    if (dataFormat.value == 'group-id-column') {
+      const numArr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+      const letterArr = [
+        'a',
+        'b',
+        'c',
+        'd',
+        'e',
+        'f',
+        'g',
+        'h',
+        'i',
+        'j',
+        'k',
+        'l',
+        'm',
+        'n',
+        'o',
+        'p',
+        'q',
+        'r',
+        's',
+        't',
+        'u',
+        'v',
+        'w',
+        'x',
+        'y',
+        'z'
+      ]
+
+      // processing the raw data into coords
+      doubleColumnCellRange.value.forEach((arr) => {
+        arr.forEach((e) => {
+          if (e.length == 0) throw Error('Error: Not all input coordinate values defined.')
+        })
       })
-      allGroups.push(individualGroup)
-    })
-  } /*else if (searchAllCells.value == 'group-id-column') {
-    groupWorksheet 
-  }*/ else {
-    const processedCellRange = calcCellRange(cellRange.value) // format: [[3, 12], [10, 18]]
-    for (
-      let rowIndex = processedCellRange[0][1];
-      rowIndex <= processedCellRange[1][1];
-      rowIndex++
-    ) {
-      const row = groupWorksheet.getRow(rowIndex)
-      let individualGroup = []
+      doubleColumnCellRange.value[0].forEach((e) => {
+        for (let j = 0; j < e.length; j++) {
+          if (letterArr.indexOf(e[j]) == -1)
+            throw Error('Error: non-letter character inputted in letter only input field.')
+        }
+      })
+      doubleColumnCellRange.value[1].forEach((e) => {
+        for (let j = 0; j < e.length; j++) {
+          if (numArr.indexOf(e[j]) == -1)
+            throw Error('Error: non-number character inputted in number only input field.')
+        }
+      })
+
       for (
-        let columnIndex = processedCellRange[0][0];
-        columnIndex <= processedCellRange[1][0];
-        columnIndex++
+        let rowIndex = processedCellRange[0][1];
+        rowIndex <= processedCellRange[1][1];
+        rowIndex++
       ) {
-        const cell = row.getCell(columnIndex)
-        processRawStr(cell.value, individualGroup, isCommaSeperated)
+        const row = groupWorksheet.getRow(rowIndex)
+        let individualGroup = []
+        for (
+          let columnIndex = processedCellRange[0][0];
+          columnIndex <= processedCellRange[1][0];
+          columnIndex++
+        ) {
+          const cell = row.getCell(columnIndex)
+          processRawStr(cell.value, individualGroup, isCommaSeperated)
+        }
+        allGroups.push(individualGroup)
       }
-      allGroups.push(individualGroup)
+    } else if (searchAllCells.value == true) {
+      groupWorksheet.eachRow((row) => {
+        let individualGroup = []
+        row.eachCell((cell) => {
+          processRawStr(cell.value, individualGroup, isCommaSeperated)
+        })
+        allGroups.push(individualGroup)
+      })
+    } else {
+      const processedCellRange = calcCellRange(cellRange.value) // format: [[3, 12], [10, 18]]
+      for (
+        let rowIndex = processedCellRange[0][1];
+        rowIndex <= processedCellRange[1][1];
+        rowIndex++
+      ) {
+        const row = groupWorksheet.getRow(rowIndex)
+        let individualGroup = []
+        for (
+          let columnIndex = processedCellRange[0][0];
+          columnIndex <= processedCellRange[1][0];
+          columnIndex++
+        ) {
+          const cell = row.getCell(columnIndex)
+          processRawStr(cell.value, individualGroup, isCommaSeperated)
+        }
+        allGroups.push(individualGroup)
+      }
     }
+    return allGroups
+  } catch (e) {
+    alert(e)
   }
-  return allGroups
 }
 
 async function executeSort() {
@@ -225,50 +294,53 @@ async function exportResultsAsXLSX() {
     <br />
     <br />
     <div v-if="dataFormat == 'group-id-column'">
-      <label for="name-cell-range">Name Column Cell Range: </label>
+      <label for="name-cell-range">Name Column: </label>
       <input
         v-model="doubleColumnCellRange[0][0]"
         type="text"
         size="4"
-        minlength="2"
+        minlength="1"
         name="name-cell-range"
         id="name-cell-range"
         required
-        placeholder="A1"
+        placeholder="A"
       />
-      :
+      <br />
+      <label for="name-cell-range">Group ID Column: </label>
       <input
         v-model="doubleColumnCellRange[0][1]"
         type="text"
         size="4"
-        minlength="2"
-        name="name-cell-range"
-        id="name-cell-range"
-        required
-        placeholder="A3"
-      />
-      <br />
-      <label for="id-cell-range">Group ID Column Cell Range: </label>
-      <input
-        v-model="doubleColumnCellRange[1][0]"
-        type="text"
-        size="4"
-        minlength="2"
+        minlength="1"
         name="id-cell-range"
         id="id-cell-range"
         required
-        placeholder="C1"
+        placeholder="B"
+      />
+      <br />
+      <label for="id-cell-range">Row Index Range: </label>
+      <input
+        v-model="doubleColumnCellRange[1][0]"
+        type="number"
+        size="4"
+        minlength="1"
+        name="id-cell-range"
+        id="id-cell-range"
+        required
+        placeholder="1"
+        min="1"
       />
       :
       <input
         v-model="doubleColumnCellRange[1][1]"
-        type="text"
+        type="number"
         size="4"
-        minlength="2"
+        minlength="1"
         name="id-cell-range"
         id="id-cell-range"
         required
-        placeholder="C3"
+        placeholder="3"
+        min="1"
       />
     </div>
     <div v-else>
