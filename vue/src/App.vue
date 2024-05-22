@@ -195,8 +195,30 @@ function toggleKey() {
 <template>
   <div id="app">
     <div class="Ldiv">
-      <div v-if="showExample1" class="example1">hi hi hi</div>
-      <div v-if="showExample2" class="example2"></div>
+      <div v-if="showExample2" class="ex example2">
+        <img
+          src="/public/example2.png"
+          alt="Example image of several names in one cell separated by a comma for reference"
+        />
+        <img
+          @click="showExample2 = !showExample2"
+          class="closeIcon"
+          src="/public/close.png"
+          alt="x to close webpage"
+        />
+      </div>
+      <div v-if="showExample1" class="ex example1">
+        <img
+          src=""
+          alt="Example image of several names in one cell separated by a comma for reference"
+        />
+        <img
+          @click="showExample1 = !showExample1"
+          class="closeIcon"
+          src="/public/close.png"
+          alt="x to close webpage"
+        />
+      </div>
       <h1>Prom Sorter</h1>
       <div class="form">
         <div class="fileUpload">
@@ -229,7 +251,7 @@ function toggleKey() {
           <label class="containerCheck" for="rows-columns"
             >Each row has one person's name in each cell</label
           >
-          <h3 class="example btn" @click="showExample1 = !showExample1"><i>Example</i></h3>
+          <h3 class="example btn" @click="showExample1 = !showExample1">Example</h3>
         </div>
         <div class="dataFormatContainer">
           <input
@@ -242,7 +264,7 @@ function toggleKey() {
           <label class="containerCheck" for="single-cell-comma-seperated"
             >One cell per row has all of a group's names in it
           </label>
-          <h3 class="example btn" @click="showExample2 = !showExample2"><i>Example</i></h3>
+          <h3 class="example btn" @click="showExample2 = !showExample2">Example</h3>
         </div>
         <label class="dataFormatContainer" for=""
           >• Several names in one cell must be separated by a comma</label
