@@ -197,7 +197,7 @@ function toggleKey() {
     <div class="Ldiv">
       <div v-if="showExample2" class="ex example2">
         <img
-          src="/public/example2.png"
+          src="/public/single-cell-comma-seperated-info.png"
           alt="Example image of several names in one cell separated by a comma for reference"
         />
         <img
@@ -209,7 +209,7 @@ function toggleKey() {
       </div>
       <div v-if="showExample1" class="ex example1">
         <img
-          src=""
+          src="/public/rows-columns-info.png"
           alt="Example image of several names in one cell separated by a comma for reference"
         />
         <img
@@ -222,7 +222,7 @@ function toggleKey() {
       <h1>Prom Sorter</h1>
       <div class="form">
         <div class="fileUpload">
-          <label for="input-groups"><h3>1. Upload group excel file:</h3></label>
+          <label for="input-groups"><h3>1. Upload group Excel file:</h3></label>
           <label class="uploadBtn btn" for="upload-file">Upload</label>
           <input
             id="upload-file"
@@ -234,9 +234,12 @@ function toggleKey() {
             required
           />
         </div>
-        <label class="dataFormatContainer" for="input-groups"
-          >• Each row must be a separate group.</label
+        <label class="dataFormatContainer" for="input-groups">
+          <ul>
+            <li>Each row must be a separate group.</li>
+          </ul></label
         >
+
         <label for="data-format"><h3>2. Select data file format:</h3></label>
         <div class="dataFormatContainer">
           <input
@@ -266,8 +269,10 @@ function toggleKey() {
           </label>
           <h3 class="example btn" @click="showExample2 = !showExample2">Example</h3>
         </div>
-        <label class="dataFormatContainer" for=""
-          >• Several names in one cell must be separated by a comma</label
+        <label class="dataFormatContainer" for="">
+          <ul>
+            <li>Several names in one cell must be separated by a comma</li>
+          </ul></label
         >
         <label for="cell-range"><h3>3. Select data file format:</h3></label>
         <div class="containerSearchCells">
@@ -397,4 +402,12 @@ function toggleKey() {
 @import url(./assets/main.css);
 @import url(./assets/leftSide.css);
 @import url(./assets/rightSide.css);
+
+li {
+  font-size: 1.25rem;
+}
+
+input[type='radio'] {
+  width:;
+}
 </style>
