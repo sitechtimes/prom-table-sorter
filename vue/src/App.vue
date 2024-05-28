@@ -1,77 +1,3 @@
-<template>
-  <div class="leftDiv">
-    <h1>Prom Sorter</h1>
-    <ul>
-      <li>Each row must be a separate group.</li>
-      <li>Several names in one cell must be separated by a comma</li>
-    </ul>
-    <div class="form">
-      <div class="fileUpload">
-        <h2>1. Upload group Excel file</h2>
-        <label class="uploadBtn" for="upload-file"><img src="/icons/fileUpload.png"></label>
-        <input id="upload-file" class="btn" type="file" name="input-groups" ref="fileInput" accept=".xlsx" required />
-      </div>
-
-      <div class="dataFormat">
-        <h2>2. Select data file format</h2>
-        <div class="dataFormatContainer">
-          <input class="checkbox" v-model="dataFormat" type="radio" id="rows-columns" value="rows-columns" checked />
-          <label class="containerCheck" for="rows-columns">Each row has one person's name in each cell</label>
-        </div>
-        <!-- End of dataFormatContainer 1 div -->
-        <div class="dataFormatContainer">
-          <input v-model="dataFormat" class="checkbox" type="radio" id="single-cell-comma-seperated"
-            value="single-cell-comma-seperated" />
-          <label class="containerCheck" for="single-cell-comma-seperated">One cell per row has all of a group's names in
-            it
-          </label>
-        </div>
-        <!-- End of dataFormatContainer 2 div -->
-      </div>
-      <!-- End of dataFormat div -->
-      <div for="cell-range">
-        <h2>3. Select cell range</h2>
-
-        <div v-if="searchAllCells" class="disabled rangeContainerFromto">
-          <input disabled v-model="cellRange[0]" class="input-text cell-range" type="text" size="4" minlength="2"
-            name="cell-range" required />
-          :
-          <input disabled v-model="cellRange[1]" class="input-text cell-range" type="text" size="4" minlength="2"
-            name="cell-range" required />
-        </div>
-
-        <div class="rangeContainerFromto" v-else>
-          <label for="cell-range">From: </label>
-          <input v-model="cellRange[0]" class="input-text cell-range" type="text" size="4" minlength="2"
-            name="cell-range" required placeholder="A1" />
-          <label for="cell-range">To: </label>
-          <input v-model="cellRange[1]" class="input-text cell-range" type="text" size="4" minlength="2"
-            name="cell-range" required placeholder="B2" />
-        </div>
-        <!-- End of rangeContainerFromto div -->
-        <div class="searchAllCells">
-          <input type="radio" class="checkbox" name="search-all-cells" id="search-all-cells" v-model="searchAllCells"
-            minlength="5" />
-          <label for="search-all-cells">Search All Cells</label>
-        </div>
-        <!-- End of searchAllCells div -->
-      </div>
-      <!-- End of cellRange div -->
-      <div for="seat-range">
-          <h2>4. Define range of seats per table</h2>
-        <div name="seat-range" class="rangeContainerMinmax">
-          <label for="min-seats">Minimum:</label>
-          <input v-model="minSeats" class="input-text" type="number" name="min-seats" min="0" step="1" required />
-          <label for="max-seats">Maximum:</label>
-          <input v-model="maxSeats" type="number" class="input-text" name="max-seats" min="1" step="1" required />
-        </div>
-      </div>
-    </div>
-    <!-- End of form div -->
-  </div>
-  <!-- End of left div -->
-</template>
-
 <script setup>
 import { ref } from 'vue'
 import ExcelJS from 'exceljs'
@@ -266,73 +192,222 @@ function toggleKey() {
 }
 </script>
 
+<template>
+  <div id="app">
+    <div class="Ldiv">
+      <div v-if="showExample2" class="ex example2">
+        <img
+          src="/public/single-cell-comma-seperated-info.png"
+          alt="Example image of several names in one cell separated by a comma for reference"
+        />
+        <img
+          @click="showExample2 = !showExample2"
+          class="closeIcon"
+          src="/public/close.png"
+          alt="x to close webpage"
+        />
+      </div>
+      <div v-if="showExample1" class="ex example1">
+        <img
+          src="/public/rows-columns-info.png"
+          alt="Example image of several names in one cell separated by a comma for reference"
+        />
+        <img
+          @click="showExample1 = !showExample1"
+          class="closeIcon"
+          src="/public/close.png"
+          alt="x to close webpage"
+        />
+      </div>
+      <h1>Prom Sorter</h1>
+      <div class="form">
+        <div class="fileUpload">
+          <label for="input-groups"><h3>1. Upload group Excel file:</h3></label>
+          <label class="uploadBtn btn" for="upload-file">Upload</label>
+          <input
+            id="upload-file"
+            class="btn"
+            type="file"
+            name="input-groups"
+            ref="fileInput"
+            accept=".xlsx"
+            required
+          />
+        </div>
+        <label class="dataFormatContainer" for="input-groups">
+          <ul>
+            <li>Each row must be a separate group.</li>
+          </ul></label
+        >
 
-<style lang="css" scoped>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900');
-@import url('https://fonts.googleapis.com/css2?family=Hind+Madurai:wght@300;400;500;600;700&display=swap');
+        <label for="data-format"><h3>2. Select data file format:</h3></label>
+        <div class="dataFormatContainer">
+          <input
+            class="checkbox"
+            v-model="dataFormat"
+            type="radio"
+            id="rows-columns"
+            value="rows-columns"
+            checked
+          />
 
-.leftDiv {
-  display: flex;
-  flex-direction: column;
-  align-items: left;
-  margin-left: 2rem;
-  border: #bec5dc 4px solid;
-  padding: 1.5rem;
+          <label class="containerCheck" for="rows-columns"
+            >Each row has one person's name in each cell</label
+          >
+          <h3 class="example btn" @click="showExample1 = !showExample1">Example</h3>
+        </div>
+        <div class="dataFormatContainer">
+          <input
+            v-model="dataFormat"
+            class="checkbox"
+            type="radio"
+            id="single-cell-comma-seperated"
+            value="single-cell-comma-seperated"
+          />
+          <label class="containerCheck" for="single-cell-comma-seperated"
+            >One cell per row has all of a group's names in it
+          </label>
+          <h3 class="example btn" @click="showExample2 = !showExample2">Example</h3>
+        </div>
+        <label class="dataFormatContainer" for="">
+          <ul>
+            <li>Several names in one cell must be separated by a comma</li>
+          </ul></label
+        >
+        <label for="cell-range"><h3>3. Select data file format:</h3></label>
+        <div class="containerSearchCells">
+          <div v-if="searchAllCells" class="disabled rangeContainerFromto">
+            <input
+              disabled
+              v-model="cellRange[0]"
+              class="input-text cell-range"
+              type="text"
+              size="4"
+              minlength="2"
+              name="cell-range"
+              required
+            />
+            :
+            <input
+              disabled
+              v-model="cellRange[1]"
+              class="input-text cell-range"
+              type="text"
+              size="4"
+              minlength="2"
+              name="cell-range"
+              required
+            />
+          </div>
+          <div class="rangeContainerFromto" v-else>
+            <label for="cell-range">From: </label>
+            <input
+              v-model="cellRange[0]"
+              class="input-text cell-range"
+              type="text"
+              size="4"
+              minlength="2"
+              name="cell-range"
+              required
+              placeholder="A1"
+            />
+            <label for="cell-range">To: </label>
+            <input
+              v-model="cellRange[1]"
+              class="input-text cell-range"
+              type="text"
+              size="4"
+              minlength="2"
+              name="cell-range"
+              required
+              placeholder="B2"
+            />
+          </div>
+          <div class="searchAllCells">
+            <input
+              type="checkbox"
+              class="checkbox"
+              name="search-all-cells"
+              id="search-all-cells"
+              v-model="searchAllCells"
+              minlength="5"
+            />
+            <label for="search-all-cells">Search All Cells</label>
+          </div>
+        </div>
+        <label for="seat-range"><h3>4. Define range of seats per table</h3></label>
+        <div name="seat-range" class="rangeContainerMinmax">
+          <label for="min-seats">Minimum:</label>
+          <input
+            v-model="minSeats"
+            class="input-text"
+            type="number"
+            name="min-seats"
+            min="0"
+            step="1"
+            required
+          />
+          <label for="max-seats">Maximum:</label>
+          <input
+            v-model="maxSeats"
+            type="number"
+            class="input-text"
+            name="max-seats"
+            min="1"
+            step="1"
+            required
+          />
+        </div>
+        <button @click="executeSort" class="btn" id="sortBtn"><h4>Sort</h4></button>
+      </div>
+    </div>
+    <key v-if="showKey" class="key"></key>
+    <div class="Rdiv">
+      <div id="navBar">
+        <h2>Generated Tables</h2>
+        <div class="btn keyBtn" @click="showKey = !showKey"><button>Key</button></div>
+        <div v-if="sortedTables != null">
+          <a v-if="downloadURL == null" disabled class="btn">Loading...</a>
+          <a v-else :href="downloadURL" class="downloadBtn btn">Download Sorted Tables</a>
+        </div>
+      </div>
+      <div id="tables">
+        <div class="table" v-for="table in sortedTables">
+          <div class="tableHeaderContainer">
+            <h3 class="tableHeader">Table {{ table.index }}</h3>
+            <h4 class="text occupiedSeats">
+              {{ arrayLen2D(table.occupants) }}/{{ table.capacity }} Seats Occupied
+            </h4>
+          </div>
+          <div class="groupsInTable">
+            <div class="group" v-for="group in table.occupants">
+              <div v-for="person in group">
+                <p v-if="person.name == 'guest name'" class="person unnamed">
+                  <mark>{{ person.name }}</mark>
+                </p>
+                <p v-else-if="person.duplicate == true" class="person duplicate">
+                  <mark>{{ person.name }}</mark>
+                </p>
+                <p v-else class="person">{{ person.name }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+@import url(./assets/main.css);
+@import url(./assets/leftSide.css);
+@import url(./assets/rightSide.css);
+
+li {
+  font-size: 1.25rem;
 }
 
-h1 {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 3rem;
-  font-weight: bold;
-  color: rgb(55, 43, 105);
+input[type='radio'] {
+  width:;
 }
-
-h2 {
-  font-family: 'Hind Madurai', sans-serif;
-  font-size: 1.5rem;
-}
-
-label{
-  font-family: 'Hind Madurai', sans-serif;
-  font-size: 1.5rem;
-}
-
-ul {
-  display: flex;
-  flex-direction: column;
-  align-items: left;
-  font-family: 'Hind Madurai', sans-serif;
-  font-size: 1.5rem;
-}
-
-.fileUpload {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-}
-
-.uploadBtn {
-  margin-top: 5px;
-  padding-left: 0.5rem;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-#upload-file {
-  display: none;
-}
-
-.dataFormat {
-  display: flex;
-  flex-direction: column;
-  align-items: left;
-}
-
-.dataFormatContainer {
-  display: flex;
-  flex-direction: row;
-  align-items: left;
-}
-
 </style>
