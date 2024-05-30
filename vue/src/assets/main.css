@@ -20,9 +20,14 @@ body {
   background: var(--background);
   color: var(--text);
 }
+
 #app {
   display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: start;
 }
+
 .btn {
   background-color: var(--btn);
   color: var(--background);
@@ -34,33 +39,40 @@ body {
   width: 142px;
   height: 34px;
 }
+
 h1 {
   font-family: var(--font-bold);
   font-size: 72px;
   font-weight: 400;
   margin: 0;
 }
+
 h2 {
   font-family: var(--font-bold);
   font-size: 64px;
   font-weight: 400;
   margin: 0;
 }
+
 h3 {
   margin: 7px;
 }
+
 h4 {
   margin: 0;
 }
+
 h5 {
   margin: 0;
   font-family: var(--font-bold);
   font-size: 20px;
   font-weight: 500;
 }
+
 label {
   font-size: 24px;
 }
+
 .key {
   font-family: var(--font-bold);
   position: absolute;
@@ -78,6 +90,7 @@ label {
   transform: translate(-50%, -50%);
   box-shadow: 10px 5px 5px #261d4b19;
 }
+
 #keyH3 {
   font-size: 80px;
   font-weight: 500;
@@ -86,6 +99,7 @@ label {
 .plainTextKey {
   margin: 0;
 }
+
 .childKey {
   font-weight: 300;
   margin: 30px;
@@ -97,6 +111,7 @@ button {
   all: unset;
   text-align: center;
 }
+
 .keyBtn {
   cursor: pointer;
   display: flex;
@@ -106,6 +121,7 @@ button {
   padding: 0 13px;
   font-size: 20px;
 }
+
 .ex {
   background-color: var(--background);
   width: fit-content;
@@ -117,6 +133,7 @@ button {
   transform: translate(-50%, -50%);
   border: var(--frame) 2px solid;
 }
+
 .closeIcon {
   width: 50px;
   height: 50px;
