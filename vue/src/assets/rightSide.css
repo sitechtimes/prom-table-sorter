@@ -1,0 +1,64 @@
+.Rdiv {
+  width: 40vw;
+  height: 90vh;
+  border: #bec5dc 4px solid;
+  margin: 28px;
+  padding: 30px;
+  height: 85vh;
+  overflow-y: scroll;
+  font-family: var(--font-bold);
+}
+#tables {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.table {
+  background-color: var(--frame);
+  width: 45%;
+  margin: 0.5rem;
+}
+.tableHeader {
+  font-size: 24px;
+}
+.tableHeaderContainer {
+  color: var(--background);
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+}
+.occupiedSeats {
+  color: var(--background);
+  margin: 13px;
+}
+.downloadBtn {
+  padding: 13px;
+  font-size: 20px;
+  text-decoration: none;
+  height: 56px;
+}
+.groupsInTable {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: space-around;
+}
+#navBar {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+}
+.group {
+  padding: 0.5rem;
+  margin: 0.5rem;
+  background-color: var(--background);
+  width: 41%;
+  height: auto;
+  flex-grow: 1;
+}
+.person {
+  padding: 0.5rem;
+  margin: 0.5rem;
+  flex-grow: 1;
+}
