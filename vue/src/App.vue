@@ -202,16 +202,28 @@ function toggleKey() {
     <div class="main">
       <div class="leftDiv">
         <div v-if="showExample1" class="ex example1">
-          <img src="/public/rows-columns-info.png"
-            alt="Example image of several names in one cell separated by a comma for reference" />
-          <img @click="showExample1 = !showExample1" class="closeIcon" src="/public/close.png"
-            alt="x to close webpage" />
+          <img
+            src="/public/rows-columns-info.png"
+            alt="Example image of several names in one cell separated by a comma for reference"
+          />
+          <img
+            @click="showExample1 = !showExample1"
+            class="closeIcon"
+            src="/public/close.png"
+            alt="x to close webpage"
+          />
         </div>
         <div v-if="showExample2" class="ex example2">
-          <img src="/public/single-cell-comma-seperated-info.png"
-            alt="Example image of several names in one cell separated by a comma for reference" />
-          <img @click="showExample2 = !showExample2" class="closeIcon" src="/public/close.png"
-            alt="x to close webpage" />
+          <img
+            src="/public/single-cell-comma-seperated-info.png"
+            alt="Example image of several names in one cell separated by a comma for reference"
+          />
+          <img
+            @click="showExample2 = !showExample2"
+            class="closeIcon"
+            src="/public/close.png"
+            alt="x to close webpage"
+          />
         </div>
         <div class="notes">
           <h2>Please Note:</h2>
@@ -224,29 +236,47 @@ function toggleKey() {
         <div class="form">
           <div class="fileUpload">
             <h3>1. Upload group Excel file</h3>
-            <label class="uploadBtn" for="upload-file"><img src="/icons/fileUpload.png"></label>
-            <input id="upload-file" class="btn" type="file" name="input-groups" ref="fileInput" accept=".xlsx"
-              required />
+            <label class="uploadBtn" for="upload-file"><img src="/icons/fileUpload.png" /></label>
+            <input
+              id="upload-file"
+              class="btn"
+              type="file"
+              name="input-groups"
+              ref="fileInput"
+              accept=".xlsx"
+              required
+            />
           </div>
 
           <div class="dataFormat">
             <h3>2. Select data file format</h3>
             <div class="dataFormatContainer">
-              <input class="checkbox" v-model="dataFormat" type="radio" id="rows-columns" value="rows-columns"
-                checked />
-              <label class="containerCheck" for="rows-columns">Each row has one person's name in each cell</label>
-              <img class="example" @click="showExample1 = !showExample1" src="/icons/hint.png">
+              <input
+                class="checkbox"
+                v-model="dataFormat"
+                type="radio"
+                id="rows-columns"
+                value="rows-columns"
+                checked
+              />
+              <label class="containerCheck" for="rows-columns"
+                >Each row has one person's name in each cell</label
+              >
+              <img class="example" @click="showExample1 = !showExample1" src="/icons/hint.png" />
             </div>
             <!-- End of dataFormatContainer 1 div -->
             <div class="dataFormatContainer">
-              <input v-model="dataFormat" class="checkbox" type="radio" id="single-cell-comma-seperated"
-                value="single-cell-comma-seperated" />
-              <label class="containerCheck" for="single-cell-comma-seperated">One cell per row has all of a group's
-                names
-                in
-                it
+              <input
+                v-model="dataFormat"
+                class="checkbox"
+                type="radio"
+                id="single-cell-comma-seperated"
+                value="single-cell-comma-seperated"
+              />
+              <label class="containerCheck" for="single-cell-comma-seperated"
+                >One cell per row has all of a group's names in it
               </label>
-              <img class="example" @click="showExample2 = !showExample2" src="/icons/hint.png">
+              <img class="example" @click="showExample2 = !showExample2" src="/icons/hint.png" />
             </div>
             <!-- End of dataFormatContainer 2 div -->
           </div>
@@ -255,25 +285,63 @@ function toggleKey() {
             <h3>3. Select cell range</h3>
 
             <div v-if="searchAllCells" class="disabled rangeContainerFromto">
-              <input disabled v-model="cellRange[0]" class="input-text cell-range" type="text" size="4" minlength="2"
-                name="cell-range" required />
+              <input
+                disabled
+                v-model="cellRange[0]"
+                class="input-text cell-range"
+                type="text"
+                size="4"
+                minlength="2"
+                name="cell-range"
+                required
+              />
               :
-              <input disabled v-model="cellRange[1]" class="input-text cell-range" type="text" size="4" minlength="2"
-                name="cell-range" required />
+              <input
+                disabled
+                v-model="cellRange[1]"
+                class="input-text cell-range"
+                type="text"
+                size="4"
+                minlength="2"
+                name="cell-range"
+                required
+              />
             </div>
 
             <div class="rangeContainerFromto" v-else>
               <label for="cell-range">From: </label>
-              <input v-model="cellRange[0]" class="input-text cell-range" type="text" size="4" minlength="2"
-                name="cell-range" required placeholder="A1" />
+              <input
+                v-model="cellRange[0]"
+                class="input-text cell-range"
+                type="text"
+                size="4"
+                minlength="2"
+                name="cell-range"
+                required
+                placeholder="A1"
+              />
               <label for="cell-range">To: </label>
-              <input v-model="cellRange[1]" class="input-text cell-range" type="text" size="4" minlength="2"
-                name="cell-range" required placeholder="B2" />
+              <input
+                v-model="cellRange[1]"
+                class="input-text cell-range"
+                type="text"
+                size="4"
+                minlength="2"
+                name="cell-range"
+                required
+                placeholder="B2"
+              />
             </div>
             <!-- End of rangeContainerFromto div -->
             <div class="searchAllCells">
-              <input type="radio" class="checkbox" name="search-all-cells" id="search-all-cells"
-                v-model="searchAllCells" minlength="5" />
+              <input
+                type="radio"
+                class="checkbox"
+                name="search-all-cells"
+                id="search-all-cells"
+                v-model="searchAllCells"
+                minlength="5"
+              />
               <label for="search-all-cells">Search All Cells</label>
             </div>
             <!-- End of searchAllCells div -->
@@ -283,15 +351,29 @@ function toggleKey() {
             <h3>4. Define range of seats per table</h3>
             <div name="seat-range" class="rangeContainerMinmax">
               <label for="min-seats">Minimum:</label>
-              <input v-model="minSeats" class="input-text" type="number" name="min-seats" min="0" step="1" required />
+              <input
+                v-model="minSeats"
+                class="input-text"
+                type="number"
+                name="min-seats"
+                min="0"
+                step="1"
+                required
+              />
               <label for="max-seats">Maximum:</label>
-              <input v-model="maxSeats" type="number" class="input-text" name="max-seats" min="1" step="1" required />
+              <input
+                v-model="maxSeats"
+                type="number"
+                class="input-text"
+                name="max-seats"
+                min="1"
+                step="1"
+                required
+              />
             </div>
           </div>
           <!-- End of seatRange div -->
-          <button @click="executeSort" class="btn" id="sortBtn">
-            Sort
-          </button>
+          <button @click="executeSort" class="btn" id="sortBtn">Sort</button>
         </div>
         <!-- End of form div -->
       </div>
@@ -300,7 +382,15 @@ function toggleKey() {
         <div id="navBar">
           <h2>Generated Tables</h2>
           <button class="keyBtn" @click="showKey = !showKey">Key</button>
-          <key v-if="showKey" class="key"></key>
+          <div v-if="showKey" class="key">
+            <key></key>
+            <img
+              @click="showKey = !showKey"
+              class="closeIcon"
+              src="/public/close.png"
+              alt="x to close webpage"
+            />
+          </div>
           <div v-if="sortedTables != null">
             <a v-if="downloadURL == null" disabled class="btn">Loading...</a>
             <a v-else :href="downloadURL" class="downloadBtn btn">Download Sorted Tables</a>
@@ -342,7 +432,7 @@ function toggleKey() {
 }
 
 .main {
-  color: #372B69;
+  color: #372b69;
   display: flex;
   flex-direction: row;
 }
@@ -360,7 +450,7 @@ function toggleKey() {
   height: 0.2rem;
   width: 70vw;
   margin-left: 1rem;
-  background-color: #372B69;
+  background-color: #372b69;
 }
 
 .leftDiv {
@@ -378,7 +468,7 @@ function toggleKey() {
   flex-direction: column;
   align-items: left;
   margin-left: 2rem;
-  border: #372B69 0.2rem solid;
+  border: #372b69 0.2rem solid;
   padding: 1.5rem;
   height: 80vh;
   width: 45vw;
@@ -397,28 +487,33 @@ h1 {
   font-style: italic;
   font-size: 4rem;
   font-weight: bold;
-  color: #372B69;
+  color: #372b69;
 }
 
 h2 {
-  font-family: Noto Sans, sans-serif;
+  font-family:
+    Noto Sans,
+    sans-serif;
   font-size: 1.75rem;
-  color: #372B69;
+  color: #372b69;
   font-weight: 600;
-  ;
 }
 
 h3 {
-  font-family: Noto Sans, sans-serif;
+  font-family:
+    Noto Sans,
+    sans-serif;
   font-size: 1.75rem;
-  color: #372B69;
+  color: #372b69;
   font-weight: 600;
   line-height: 1.4;
   margin-top: 2.3125rem;
 }
 
 label {
-  font-family: Noto Sans, sans-serif;
+  font-family:
+    Noto Sans,
+    sans-serif;
   font-size: 1.5rem;
 }
 
@@ -426,24 +521,30 @@ ul {
   display: flex;
   flex-direction: column;
   align-items: left;
-  font-family: Noto Sans, sans-serif;
+  font-family:
+    Noto Sans,
+    sans-serif;
   font-size: 1.5rem;
 }
 
 #sortBtn {
   font-size: 1.5rem;
-  font-family: playfair display, serif;
+  font-family:
+    playfair display,
+    serif;
   font-style: italic;
   padding: 5px;
-  background-color: #372B69;
+  background-color: #372b69;
   border-radius: 0;
   margin-top: 2rem;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
   text-align: center;
 }
 
 #sortBtn:hover {
-  background-color: #5E4C9B;
+  background-color: #5e4c9b;
   transition-delay: 0.1s;
 }
 
@@ -454,7 +555,7 @@ ul {
 input[type='radio'] {
   width: 1.5rem;
   height: 1.5rem;
-  border: 2px solid #372B69;
+  border: 2px solid #372b69;
   border-radius: 50%;
 }
 
@@ -470,7 +571,7 @@ input[type='radio'] {
   margin-top: 2rem;
 }
 
-img:hover{
+img:hover {
   transition: transform 0.2s ease;
   transform: scale(1.1);
 }
@@ -512,7 +613,9 @@ img:hover{
 }
 
 .input-text {
-  font-family: Noto Sans, sans-serif;
+  font-family:
+    Noto Sans,
+    sans-serif;
   font-size: 1rem;
   padding: 0.5rem;
   margin-left: 0.5rem;
@@ -559,9 +662,11 @@ img:hover{
 }
 
 .keyBtn {
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  color: #372B69;
-  border: #372B69 solid;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
+  color: #372b69;
+  border: #372b69 solid;
   text-align: center;
   width: 8rem;
   text-align: center;
