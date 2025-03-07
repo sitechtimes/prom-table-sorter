@@ -104,6 +104,7 @@ function processRawStr(rawStr, targetArr, valuesCommaSeperated) {
   }
 }
 
+//xlsx 
 async function getGroups() {
   const uploadedFile = await fileInput.value.files[0].arrayBuffer()
   const importWorkbook = new ExcelJS.Workbook()
@@ -142,6 +143,11 @@ async function getGroups() {
   return allGroups
 }
 
+async function getGroups2(){
+  const uploadedCSV = new Excel.Workbook();
+  //const asdc = await workbook.csv.readFile(filename);
+}
+
 async function executeSort() {
   const guestGroups = await getGroups()
   // console.log(guestGroups)
@@ -153,6 +159,7 @@ async function executeSort() {
   exportResultsAsXLSX()
 }
 
+//xlsx
 async function exportResultsAsXLSX() {
   const exportWorkbook = new ExcelJS.Workbook()
   const sortedWorksheet = exportWorkbook.addWorksheet('Sorted Tables')
