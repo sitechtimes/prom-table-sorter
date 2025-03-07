@@ -152,11 +152,6 @@ async function getGroups() {
   return allGroups
 }
 
-async function getGroups2(){
-  const uploadedCSV = new Excel.Workbook();
-  //const asdc = await workbook.csv.readFile(filename);
-}
-
 async function executeSort() {
   const guestGroups = await getGroups()
   // console.log(guestGroups)
