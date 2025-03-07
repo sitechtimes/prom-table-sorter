@@ -15,6 +15,7 @@ const searchAllCells = ref(false)
 let showKey = ref(false)
 let showExample1 = ref(false)
 let showExample2 = ref(false)
+let showExample3 = ref(false)
 
 function calcCellRange(inputCellRange) {
   const errorMsg = 'Invalid Cell Coordinates Inputted'
@@ -90,14 +91,23 @@ function calcCellRange(inputCellRange) {
   }
 }
 
-function processRawStr(rawStr, targetArr, valuesCommaSeperated) {
+function processRawStr(rawStr, targetArr, dataFormat) {
   if (rawStr != null) {
-    if (valuesCommaSeperated == true)
+    if (dataFormat == 'single-cell-comma-seperated')
       rawStr.split(',').forEach((e) => {
         const processedStr = e.trim()
         if (processedStr.length > 0) targetArr.push(processedStr)
       })
-    else {
+    else if (dataFormat == 'rows-columns-with-id') {
+      const processedStr = rawStr.trim()
+      if (processedStr.length > 0) {
+        if (Number.isInteger(processedStr)) {
+          targetArr[targetArr.length - 1]['id'] = Number(processedStr)
+        } else if (processedStr != 'Yes' && processedStr != 'No') {
+          targetArr.push({ name: processedStr })
+        }
+      }
+    } else {
       const processedStr = rawStr.trim()
       if (processedStr.length > 0) targetArr.push(processedStr)
     }
@@ -111,12 +121,11 @@ async function getGroups() {
   await importWorkbook.xlsx.load(uploadedFile)
   const groupWorksheet = importWorkbook.worksheets[0]
   let allGroups = []
-  const isCommaSeperated = dataFormat.value == 'single-cell-comma-seperated'
   if (searchAllCells.value == true) {
     groupWorksheet.eachRow((row) => {
       let individualGroup = []
       row.eachCell((cell) => {
-        processRawStr(cell.value, individualGroup, isCommaSeperated)
+        processRawStr(cell.value, individualGroup, dataFormat.value)
       })
       allGroups.push(individualGroup)
     })
@@ -135,7 +144,7 @@ async function getGroups() {
         columnIndex++
       ) {
         const cell = row.getCell(columnIndex)
-        processRawStr(cell.value, individualGroup, isCommaSeperated)
+        processRawStr(cell.value, individualGroup, dataFormat.value)
       }
       allGroups.push(individualGroup)
     }
@@ -211,7 +220,7 @@ function toggleKey() {
         <div v-if="showExample1" class="ex example1">
           <img
             src="/public/rows-columns-info.png"
-            alt="Example image of several names in one cell separated by a comma for reference"
+            alt="Example image of several names in one cell each, filling multiple rows and cells per row"
           />
           <img
             @click="showExample1 = !showExample1"
@@ -227,6 +236,18 @@ function toggleKey() {
           />
           <img
             @click="showExample2 = !showExample2"
+            class="closeIcon"
+            src="/public/close.png"
+            alt="x to close webpage"
+          />
+        </div>
+        <div v-if="showExample3" class="ex example3">
+          <img
+            src="/public/placeholder.png"
+            alt="Example image of several names and IDs in one cell each, filling multiple rows and cells per row"
+          />
+          <img
+            @click="showExample3 = !showExample3"
             class="closeIcon"
             src="/public/close.png"
             alt="x to close webpage"
@@ -286,6 +307,21 @@ function toggleKey() {
               <img class="example" @click="showExample2 = !showExample2" src="/icons/hint.png" />
             </div>
             <!-- End of dataFormatContainer 2 div -->
+            <div class="dataFormatContainer">
+              <input
+                v-model="dataFormat"
+                class="checkbox"
+                type="radio"
+                id="rows-columns-with-id"
+                value="rows-columns-with-id"
+              />
+              <label class="containerCheck" for="rows-columns-with-id"
+                >Each row has one person's name in a cell and the person's id in the next cell for
+                each person in the group
+              </label>
+              <img class="example" @click="showExample3 = !showExample3" src="/icons/hint.png" />
+            </div>
+            <!-- End of dataFormatContainer 3 div -->
           </div>
           <!-- End of dataFormat div -->
           <div for="cell-range">
