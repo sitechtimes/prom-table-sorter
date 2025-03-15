@@ -96,7 +96,7 @@ function processRawStr(rawStr, targetArr, dataFormat) {
     if (dataFormat == 'single-cell-comma-seperated')
       rawStr.split(',').forEach((e) => {
         const processedStr = e.trim()
-        if (processedStr.length > 0) targetArr.push(processedStr)
+        if (processedStr.length > 0) targetArr.push({ name: processedStr })
       })
     else if (dataFormat == 'rows-columns-with-id') {
       const processedStr = rawStr.trim()
@@ -109,12 +109,12 @@ function processRawStr(rawStr, targetArr, dataFormat) {
       }
     } else {
       const processedStr = rawStr.trim()
-      if (processedStr.length > 0) targetArr.push(processedStr)
+      if (processedStr.length > 0) targetArr.push({ name: processedStr })
     }
   }
 }
 
-//xlsx 
+//xlsx
 async function getGroups() {
   const uploadedFile = await fileInput.value.files[0].arrayBuffer()
   const importWorkbook = new ExcelJS.Workbook()
@@ -156,7 +156,13 @@ async function executeSort() {
   const guestGroups = await getGroups()
   // console.log(guestGroups)
   try {
-    sortedTables.value = rangeSort(guestGroups, algoFunctionOptions, maxSeats.value, minSeats.value)
+    sortedTables.value = rangeSort(
+      guestGroups,
+      algoFunctionOptions,
+      maxSeats.value,
+      minSeats.value,
+      dataFormat.value == 'rows-columns-with-id'
+    )
   } catch (error) {
     alert(error.message)
   }

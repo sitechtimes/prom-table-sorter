@@ -101,18 +101,24 @@ function checkInputValidity(
   }
 }
 
-function tagDuplicates(checkGroupArr) {
+function tagDuplicates(checkGroupArr, tagDuplicatesByID = false) {
   /*   for (let x = 0; x < checkGroupArr.length; x++) {
     for (let y = 0; y < checkGroupArr[x].length; y++) {}
   } */
+  let compareFunc
+  if (tagDuplicatesByID == true) {
+    compareFunc = (a, b) => a.id === b.id
+  } else {
+    compareFunc = (a, b) => a.name === b.name
+  }
   let newGroupArr = []
-  checkGroupArr.forEach((targetGroup) => {
+  checkGroupArr.forEach((group) => {
     let newGroup = []
-    targetGroup.forEach((targetName) => {
+    group.forEach((person) => {
       let timesAppeared = 0
       for (let i = 0; i < checkGroupArr.length; i++) {
         for (let j = 0; j < checkGroupArr[i].length; j++) {
-          if (targetName == checkGroupArr[i][j]) {
+          if (compareFunc(person, checkGroupArr[i][j]) == true) {
             timesAppeared++
             if (timesAppeared > 1) break
           }
@@ -120,9 +126,8 @@ function tagDuplicates(checkGroupArr) {
         if (timesAppeared > 1) break
       }
 
-      timesAppeared > 1
-        ? newGroup.push({ name: targetName, duplicate: true })
-        : newGroup.push({ name: targetName, duplicate: false })
+      timesAppeared > 1 ? (person.duplicate = true) : (person.duplicate = false)
+      newGroup.push(person)
     })
     newGroupArr.push(newGroup)
   })
@@ -158,7 +163,7 @@ function mainSort(mainGroups, mainTables, algoOptions) {
   return result
 }
 
-function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
+function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0, tagDuplicatesByID) {
   let tableArr = Array(Math.ceil(arrayLen2D(groupArr) / maxSeats)).fill(maxSeats)
   checkInputValidity(
     groupArr,
@@ -170,7 +175,7 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0) {
     `ERROR:\n\nTables too small: the largest table has {tableSeats} seats, but the largest group has {groupGuests} guests. Try increasing the maximum number of seats per table.`
   )
 
-  const groupObjArr = tagDuplicates(groupArr)
+  const groupObjArr = tagDuplicates(groupArr, tagDuplicatesByID)
 
   let result = null
   const maxAdditionalTables = groupArr.length - tableArr.length
