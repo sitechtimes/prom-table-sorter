@@ -145,17 +145,14 @@ async function getGroups() {
         processRawStr(cell.value, individualGroup, dataFormat.value)
       }
       allGroups.push(individualGroup)
-      // console.log(individualGroup)
     }
   }
-  // console.log(allGroups)
 
   return allGroups
 }
 
 async function executeSort() {
   const guestGroups = await getGroups()
-  // console.log(guestGroups)
   try {
     sortedTables.value = rangeSort(
       guestGroups,
