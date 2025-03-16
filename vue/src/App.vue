@@ -99,10 +99,10 @@ function processRawStr(rawStr, targetArr, dataFormat) {
         if (processedStr.length > 0) targetArr.push({ name: processedStr })
       })
     else if (dataFormat == 'rows-columns-with-id') {
-      const processedStr = rawStr.trim()
+      const processedStr = typeof rawStr == 'string' ? rawStr.trim() : rawStr
       if (processedStr.length > 0) {
-        if (Number.isInteger(processedStr)) {
-          targetArr[targetArr.length - 1]['id'] = Number(processedStr)
+        if (typeof processedStr == 'number') {
+          targetArr[targetArr.length - 1]['id'] = processedStr
         } else if (processedStr != 'Yes' && processedStr != 'No') {
           targetArr.push({ name: processedStr })
         }
