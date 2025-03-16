@@ -100,12 +100,10 @@ function processRawStr(rawStr, targetArr, dataFormat) {
       })
     else if (dataFormat == 'rows-columns-with-id') {
       const processedStr = typeof rawStr == 'string' ? rawStr.trim() : rawStr
-      if (processedStr.length > 0) {
-        if (typeof processedStr == 'number') {
-          targetArr[targetArr.length - 1]['id'] = processedStr
-        } else if (processedStr != 'Yes' && processedStr != 'No') {
-          targetArr.push({ name: processedStr })
-        }
+      if (typeof processedStr == 'number') {
+        targetArr[targetArr.length - 1].id = processedStr
+      } else if (processedStr.length > 0 && processedStr != 'Yes' && processedStr != 'No') {
+        targetArr.push({ name: processedStr })
       }
     } else {
       const processedStr = rawStr.trim()
@@ -147,8 +145,11 @@ async function getGroups() {
         processRawStr(cell.value, individualGroup, dataFormat.value)
       }
       allGroups.push(individualGroup)
+      // console.log(individualGroup)
     }
   }
+  // console.log(allGroups)
+
   return allGroups
 }
 
