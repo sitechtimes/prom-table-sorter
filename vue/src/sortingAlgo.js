@@ -113,11 +113,14 @@ function tagDuplicates(checkGroupArr, tagDuplicatesByID = false) {
   }
   let newGroupArr = []
   checkGroupArr.forEach((group) => {
+    //console.log(group)
     let newGroup = []
     group.forEach((person) => {
+      //console.log(person)
       let timesAppeared = 0
       for (let i = 0; i < checkGroupArr.length; i++) {
         for (let j = 0; j < checkGroupArr[i].length; j++) {
+          //maybe it has something to do with the addition of ids? test the for thingy tmrw
           if (compareFunc(person, checkGroupArr[i][j]) == true) {
             timesAppeared++
             if (timesAppeared > 1) break
@@ -140,7 +143,7 @@ function mainSort(mainGroups, mainTables, algoOptions) {
     mainGroups,
     mainTables,
     algoOptions[
-      algoOptions.findIndex((e) => e.name == 'Largest Groups --> Largest Tables (First)')
+    algoOptions.findIndex((e) => e.name == 'Largest Groups --> Largest Tables (First)')
     ],
     `ERROR:
       Too few tables: there are {tableSum} total table seats, but {guestSum} guests. Try increasing the number of tables.`,
@@ -169,7 +172,7 @@ function rangeSort(groupArr, algoOptions, maxSeats, minSeats = 0, tagDuplicatesB
     groupArr,
     tableArr,
     algoOptions[
-      algoOptions.findIndex((e) => e.name == 'Largest Groups --> Largest Tables (First)')
+    algoOptions.findIndex((e) => e.name == 'Largest Groups --> Largest Tables (First)')
     ],
     `INTENRAL ERROR:\n\nThis error was most likely caused by an internal issue with the code, and the error message associated with this error is most likely inapplicable. Below is that error message anyway:\n\nToo few tables: there are {tableSum} total table seats, but {guestSum} guests. Try increasing the number of tables.`,
     `ERROR:\n\nTables too small: the largest table has {tableSeats} seats, but the largest group has {groupGuests} guests. Try increasing the maximum number of seats per table.`

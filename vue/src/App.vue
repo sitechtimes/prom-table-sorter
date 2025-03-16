@@ -11,7 +11,7 @@ const dataFormat = ref(null)
 const fileInput = ref(null)
 const downloadURL = ref(null)
 const cellRange = ref([null, null])
-const searchAllCells = ref(false)
+const searchAllCells = ref(false) //select cell range checkmark
 let showKey = ref(false)
 let showExample1 = ref(false)
 let showExample2 = ref(false)
@@ -91,7 +91,7 @@ function calcCellRange(inputCellRange) {
   }
 }
 
-function processRawStr(rawStr, targetArr, dataFormat) {
+function processRawStr(rawStr, targetArr, dataFormat) { //basically formats it?
   if (rawStr != null) {
     if (dataFormat == 'single-cell-comma-seperated')
       rawStr.split(',').forEach((e) => {
@@ -100,10 +100,15 @@ function processRawStr(rawStr, targetArr, dataFormat) {
       })
     else if (dataFormat == 'rows-columns-with-id') {
       const processedStr = typeof rawStr == 'string' ? rawStr.trim() : rawStr
-      if (typeof processedStr == 'number') {
-        targetArr[targetArr.length - 1].id = processedStr
-      } else if (processedStr.length > 0 && processedStr != 'Yes' && processedStr != 'No') {
-        targetArr.push({ name: processedStr })
+      if (processedStr.length > 0) {
+        if (typeof processedStr == 'number') {
+          targetArr[targetArr.length - 1]['id'] = processedStr
+        } else if (processedStr != 'Yes' && processedStr != 'No') {
+          targetArr.push({ 
+            name: processedStr, 
+            osis: 1
+          })
+        }
       }
     } else {
       const processedStr = rawStr.trim()
@@ -114,16 +119,16 @@ function processRawStr(rawStr, targetArr, dataFormat) {
 
 //xlsx
 async function getGroups() {
-  const uploadedFile = await fileInput.value.files[0].arrayBuffer()
-  const importWorkbook = new ExcelJS.Workbook()
-  await importWorkbook.xlsx.load(uploadedFile)
-  const groupWorksheet = importWorkbook.worksheets[0]
+  const uploadedFile = await fileInput.value.files[0].arrayBuffer() //gets the data from whatever file was uploaded
+  const importWorkbook = new ExcelJS.Workbook() // new workbook
+  await importWorkbook.xlsx.load(uploadedFile)//loads (from buffer?)
+  const groupWorksheet = importWorkbook.worksheets[0]//first worksheet in workbook (i think)
   let allGroups = []
   if (searchAllCells.value == true) {
-    groupWorksheet.eachRow((row) => {
+    groupWorksheet.eachRow((row) => { 
       let individualGroup = []
       row.eachCell((cell) => {
-        processRawStr(cell.value, individualGroup, dataFormat.value)
+        processRawStr(cell.value, individualGroup, dataFormat.value) //goes to the processRawStr function
       })
       allGroups.push(individualGroup)
     })
@@ -134,7 +139,7 @@ async function getGroups() {
       rowIndex <= processedCellRange[1][1];
       rowIndex++
     ) {
-      const row = groupWorksheet.getRow(rowIndex)
+      const row = groupWorksheet.getRow(rowIndex) //looks at every row
       let individualGroup = []
       for (
         let columnIndex = processedCellRange[0][0];
@@ -201,10 +206,7 @@ async function exportResultsAsXLSX() {
   downloadURL.value = URL.createObjectURL(blob)
 }
 
-function toggleKey() {
-  let showKey = true
-  console.log('showkey=' + showKey)
-}
+
 </script>
 
 <template>
