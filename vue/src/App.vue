@@ -106,7 +106,7 @@ function processRawStr(rawStr, targetArr, dataFormat) { //basically formats it?
         } else if (processedStr != 'Yes' && processedStr != 'No') {
           targetArr.push({ 
             name: processedStr, 
-            osis: 1
+            
           })
         }
       }
