@@ -9,8 +9,10 @@ const minSeats = ref(null)
 const maxSeats = ref(null)
 const dataFormat = ref(null)
 const fileInput = ref(null)
+const paidFileInput = ref(null)
 const downloadURL = ref(null)
 const cellRange = ref([null, null])
+//const paidCellRange = ref([null, null])
 const searchAllCells = ref(false)
 let showKey = ref(false)
 let showExample1 = ref(false)
@@ -110,6 +112,84 @@ function processRawStr(rawStr, targetArr, dataFormat) {
       if (processedStr.length > 0) targetArr.push({ name: processedStr })
     }
   }
+}
+
+async function compare(){
+  const workbook = new ExcelJS.Workbook()
+  const paidWorkbook = new ExcelJS.Workbook()
+
+  const uploadedFile = await fileInput.value.files[0].arrayBuffer()
+  await workbook.xlsx.load(uploadedFile)
+  const groupWorksheet = workbook.worksheets[0]
+
+  const paidFile = await paidFileInput.value.files[0].arrayBuffer()
+  await paidWorkbook.xlsx.load(paidFile)
+  
+  const paidFirstColumn = paidWorkbook.worksheets[0].getColumn('A');
+  const paidSecondColumn = paidWorkbook.worksheets[0].getColumn('B')
+
+  const attending = {
+    name: [],
+    id:[]
+  }
+
+  const paid = {
+    name: [],
+    id: [],
+  }
+
+  paidFirstColumn.eachCell((cell) => {paid.name.push(cell.value)})
+  paidSecondColumn.eachCell((cell) => {paid.id.push(cell.value)})
+
+  let allGroups = []
+  if (searchAllCells.value == true) {
+    groupWorksheet.eachRow((row) => {
+      let individualGroup = []
+      row.eachCell((cell) => {
+        processRawStr(cell.value, individualGroup, dataFormat.value)
+      })
+      allGroups.push(individualGroup)
+    })
+  } else {
+    const processedCellRange = calcCellRange(cellRange.value) // format: [[3, 12], [10, 18]]
+    for (
+      let rowIndex = processedCellRange[0][1];
+      rowIndex <= processedCellRange[1][1];
+      rowIndex++
+    ) {
+      const row = groupWorksheet.getRow(rowIndex)
+      let individualGroup = []
+      for (
+        let columnIndex = processedCellRange[0][0];
+        columnIndex <= processedCellRange[1][0];
+        columnIndex++
+      ) {
+        const cell = row.getCell(columnIndex)
+        processRawStr(cell.value, individualGroup, dataFormat.value)
+      }
+      allGroups.push(individualGroup)
+    }
+  }
+
+  allGroups.forEach((group) => {
+    group.forEach((person) => {
+        attending.name.push(person.name);
+        attending.id.push(person.id);
+    });
+  });
+
+  for(let i=0; i < attending.name.length; i++){
+    if(paid.id.includes(attending.id[i]) === false){
+      console.log(attending.name[i] + " did not pay but has a seat")
+    } 
+  }
+
+  for(let i=0; i < paid.name.length; i++){
+    if(attending.id.includes(paid.id[i]) === false){
+      console.log(paid.name[i] + " paid but does not have a seat")
+    }
+  }
+  return allGroups
 }
 
 //xlsx
@@ -274,6 +354,21 @@ function toggleKey() {
               required
             />
           </div>
+          <div class="fileUpload">
+            <h3>Upload Excel file of those who paid</h3>
+            <label class="uploadBtn" for="upload-file2"><img src="/icons/fileUpload.png" /></label>
+            <input
+              id="upload-file2"
+              class="btn"
+              type="file"
+              name="input-groups"
+              ref="paidFileInput"
+              accept=".xlsx"
+              
+            />
+            
+            <div>name in the first column, the osis numbers in the second</div>
+          </div>
 
           <div class="dataFormat">
             <h3>2. Select data file format</h3>
@@ -373,6 +468,33 @@ function toggleKey() {
                 required
                 placeholder="B2"
               />
+
+              <!-- <h3>3. Select cell range (for paid spreadsheet)</h3>
+              <div class="rangeContainerFromto">
+              <label for="cell-range">From: </label>
+              <input
+                v-model="paidCellRange[0]"
+                class="input-text cell-range"
+                type="text"
+                size="4"
+                minlength="2"
+                name="cell-range"
+                required
+                placeholder="A1"
+              />
+              <label for="cell-range">To: </label>
+              <input
+                v-model="paidCellRange[1]"
+                class="input-text cell-range"
+                type="text"
+                size="4"
+                minlength="2"
+                name="cell-range"
+                required
+                placeholder="B2"
+              />
+            </div> -->
+              
             </div>
             <!-- End of rangeContainerFromto div -->
             <div class="searchAllCells">
@@ -416,6 +538,7 @@ function toggleKey() {
           </div>
           <!-- End of seatRange div -->
           <button @click="executeSort" class="btn" id="sortBtn">Sort</button>
+          <button @click="compare" class="btn">compare</button>
         </div>
         <!-- End of form div -->
       </div>
@@ -626,6 +749,10 @@ img:hover {
 }
 
 #upload-file {
+  display: none;
+}
+
+#upload-file2 {
   display: none;
 }
 
