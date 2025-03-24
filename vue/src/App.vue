@@ -237,6 +237,7 @@ async function getGroups() {
 }
 
 async function executeSort() {
+  compare()
   const guestGroups = await getGroups()
   try {
     sortedTables.value = rangeSort(
@@ -370,10 +371,9 @@ function toggleKey() {
               name="input-groups"
               ref="paidFileInput"
               accept=".xlsx"
-              
             />
             
-            <div>name in the first column, the osis numbers in the second</div>
+            <p id="fileUplaodCaption">name in the first column, the osis numbers in the second</p>
           </div>
 
           <div class="dataFormat">
@@ -475,32 +475,6 @@ function toggleKey() {
                 placeholder="B2"
               />
 
-              <!-- <h3>3. Select cell range (for paid spreadsheet)</h3>
-              <div class="rangeContainerFromto">
-              <label for="cell-range">From: </label>
-              <input
-                v-model="paidCellRange[0]"
-                class="input-text cell-range"
-                type="text"
-                size="4"
-                minlength="2"
-                name="cell-range"
-                required
-                placeholder="A1"
-              />
-              <label for="cell-range">To: </label>
-              <input
-                v-model="paidCellRange[1]"
-                class="input-text cell-range"
-                type="text"
-                size="4"
-                minlength="2"
-                name="cell-range"
-                required
-                placeholder="B2"
-              />
-            </div> -->
-              
             </div>
             <!-- End of rangeContainerFromto div -->
             <div class="searchAllCells">
@@ -543,7 +517,7 @@ function toggleKey() {
             </div>
           </div>
           <!-- End of seatRange div -->
-          <button @click="executeSort, compare" class="btn" id="sortBtn">Sort</button>
+          <button @click="executeSort" class="btn" id="sortBtn">Sort</button>
           
         </div>
         <!-- End of form div -->
@@ -567,10 +541,10 @@ function toggleKey() {
         <div v-if="showComparison" class="key">
           <div>
           <h3>The following students have not paid but has a seat</h3>
-            <p>{{ noPaid }}</p>
+            <p class="compareResult">{{ noPaid.join() }}</p>
 
             <h3>The following students have paid but does not have a seat</h3>
-            <p>{{ noSeat }}</p>
+            <p class="compareResult">{{ noSeat.join() }}</p>
           </div>
             <img
               @click="showComparison = !showComparison"
@@ -667,15 +641,6 @@ function toggleKey() {
   overflow-y: scroll;
 }
 
-.compare{
-  /* position: absolute;
-  bottom: 0rem;
-  right: 0rem; */
-  font-size: 18px;
-  padding: 10rem;
-  width: 45vw;
-}
-
 .searchAllCells {
   display: flex;
   flex-direction: row;
@@ -752,6 +717,10 @@ ul {
 
 #sortBtn:active {
   transform: scale(1.25);
+}
+
+#fileUploadCaption{
+  flex-wrap: wrap;
 }
 
 input[type='radio'] {
@@ -876,5 +845,10 @@ img:hover {
   text-align: center;
   width: 8rem;
   text-align: center;
+}
+
+.compareResult{
+  display: flex;
+  flex-wrap: wrap;
 }
 </style>
