@@ -12,12 +12,15 @@ const fileInput = ref(null)
 const paidFileInput = ref(null)
 const downloadURL = ref(null)
 const cellRange = ref([null, null])
-//const paidCellRange = ref([null, null])
 const searchAllCells = ref(false)
+const noPaid = ref([])
+const noSeat = ref([])
 let showKey = ref(false)
+let showComparison = ref(false)
 let showExample1 = ref(false)
 let showExample2 = ref(false)
 let showExample3 = ref(false)
+
 
 function calcCellRange(inputCellRange) {
   const errorMsg = 'Invalid Cell Coordinates Inputted'
@@ -181,12 +184,14 @@ async function compare(){
   for(let i=0; i < attending.name.length; i++){
     if(paid.id.includes(attending.id[i]) === false){
       console.log(attending.name[i] + " did not pay but has a seat")
+      noPaid.value.push(attending.name[i])
     } 
   }
 
   for(let i=0; i < paid.name.length; i++){
     if(attending.id.includes(paid.id[i]) === false){
       console.log(paid.name[i] + " paid but does not have a seat")
+      noSeat.value.push(paid.name[i])
     }
   }
   return allGroups
@@ -285,6 +290,7 @@ function toggleKey() {
   let showKey = true
   console.log('showkey=' + showKey)
 }
+
 </script>
 
 <template>
@@ -537,8 +543,8 @@ function toggleKey() {
             </div>
           </div>
           <!-- End of seatRange div -->
-          <button @click="executeSort" class="btn" id="sortBtn">Sort</button>
-          <button @click="compare" class="btn">compare</button>
+          <button @click="executeSort, compare" class="btn" id="sortBtn">Sort</button>
+          
         </div>
         <!-- End of form div -->
       </div>
@@ -556,11 +562,30 @@ function toggleKey() {
               alt="x to close webpage"
             />
           </div>
+
+          <button class="keyBtn" @click="showComparison = !showComparison">Comparison</button>
+        <div v-if="showComparison" class="key">
+          <div>
+          <h3>The following students have not paid but has a seat</h3>
+            <p>{{ noPaid }}</p>
+
+            <h3>The following students have paid but does not have a seat</h3>
+            <p>{{ noSeat }}</p>
+          </div>
+            <img
+              @click="showComparison = !showComparison"
+              class="closeIcon"
+              src="/public/close.png"
+              alt="x to close webpage"
+            />
+        </div>
+
           <div v-if="sortedTables != null">
             <a v-if="downloadURL == null" disabled class="btn">Loading...</a>
             <a v-else :href="downloadURL" class="downloadBtn btn">Download Sorted Tables</a>
           </div>
         </div>
+
         <div id="tables">
           <div class="table" v-for="table in sortedTables">
             <div class="tableHeaderContainer">
@@ -592,7 +617,9 @@ function toggleKey() {
 <style lang="css" scoped>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
+
 .body {
+  /* position: relative; */
   padding: 2rem;
 }
 
@@ -640,12 +667,22 @@ function toggleKey() {
   overflow-y: scroll;
 }
 
+.compare{
+  /* position: absolute;
+  bottom: 0rem;
+  right: 0rem; */
+  font-size: 18px;
+  padding: 10rem;
+  width: 45vw;
+}
+
 .searchAllCells {
   display: flex;
   flex-direction: row;
   align-items: center;
   margin-top: 1rem;
 }
+
 
 h1 {
   font-family: 'Playfair Display', serif;
