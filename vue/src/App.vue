@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import ExcelJS from 'exceljs'
 import { rangeSort, algoFunctionOptions, arrayLen2D } from './sortingAlgo.js'
 import key from './components/key.vue'
@@ -13,8 +13,14 @@ const paidFileInput = ref(null)
 const downloadURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
-const noPaid = ref([])
-const noSeat = ref([])
+const noPaid = reactive({
+  name: [],
+  osis: [],
+})
+const noSeat = reactive({
+  name: [],
+  osis: [],
+})
 let showKey = ref(false)
 let showComparison = ref(false)
 let showExample1 = ref(false)
@@ -184,16 +190,20 @@ async function compare(){
   for(let i=0; i < attending.name.length; i++){
     if(paid.id.includes(attending.id[i]) === false){
       console.log(attending.name[i] + " did not pay but has a seat")
-      noPaid.value.push(attending.name[i])
+      noPaid.name.push(attending.name[i])
+      noPaid.osis.push(attending.id[i])
     } 
   }
 
   for(let i=0; i < paid.name.length; i++){
     if(attending.id.includes(paid.id[i]) === false){
       console.log(paid.name[i] + " paid but does not have a seat")
-      noSeat.value.push(paid.name[i])
+      noSeat.name.push(paid.name[i])
+      noSeat.osis.push(paid.id[i])
     }
   }
+
+  console.log(noPaid, noSeat)
   return allGroups
 }
 
@@ -251,6 +261,16 @@ async function executeSort() {
     alert(error.message)
   }
   exportResultsAsXLSX()
+}
+
+async function exportComparisonsAsCSV(){
+  const exportWorkbook = new ExcelJS.Workbook()
+  const sortedWorksheet = exportWorkbook.addWorksheet("comparison")
+  noPaid.value.forEach((person, columnIndex) => {
+    const column = sortedWorksheet.getColumn(columnIndex ++)
+    person.name.forEach((my) => console.log(my))
+  } )
+
 }
 
 //xlsx
@@ -541,10 +561,10 @@ function toggleKey() {
         <div v-if="showComparison" class="key">
           <div>
           <h3>The following students have not paid but has a seat</h3>
-            <p class="compareResult">{{ noPaid.join() }}</p>
+            <p class="compareResult">{{ noPaid}}</p>
 
             <h3>The following students have paid but does not have a seat</h3>
-            <p class="compareResult">{{ noSeat.join() }}</p>
+            <p class="compareResult">{{ noSeat}}</p>
           </div>
             <img
               @click="showComparison = !showComparison"
@@ -720,6 +740,7 @@ ul {
 }
 
 #fileUploadCaption{
+  display: flex;
   flex-wrap: wrap;
 }
 
