@@ -11,6 +11,7 @@ const dataFormat = ref(null)
 const fileInput = ref(null)
 const paidFileInput = ref(null)
 const downloadURL = ref(null)
+const downloadComparisonURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
 const noPaid = reactive({
@@ -22,7 +23,7 @@ const noSeat = reactive({
   osis: [],
 })
 let showKey = ref(false)
-let showComparison = ref(false)
+//let showComparison = ref(false)
 let showExample1 = ref(false)
 let showExample2 = ref(false)
 let showExample3 = ref(false)
@@ -189,7 +190,7 @@ async function compare(){
 
   for(let i=0; i < attending.name.length; i++){
     if(paid.id.includes(attending.id[i]) === false){
-      console.log(attending.name[i] + " did not pay but has a seat")
+      //console.log(attending.name[i] + " did not pay but has a seat")
       noPaid.name.push(attending.name[i])
       noPaid.osis.push(attending.id[i])
     } 
@@ -197,13 +198,13 @@ async function compare(){
 
   for(let i=0; i < paid.name.length; i++){
     if(attending.id.includes(paid.id[i]) === false){
-      console.log(paid.name[i] + " paid but does not have a seat")
+      //console.log(paid.name[i] + " paid but does not have a seat")
       noSeat.name.push(paid.name[i])
       noSeat.osis.push(paid.id[i])
     }
   }
 
-  console.log(noPaid, noSeat)
+  //console.log(noPaid, noSeat)
   return allGroups
 }
 
@@ -261,16 +262,33 @@ async function executeSort() {
     alert(error.message)
   }
   exportResultsAsXLSX()
+  exportComparisonsAsXLSX()
 }
 
-async function exportComparisonsAsCSV(){
+async function exportComparisonsAsXLSX(){
   const exportWorkbook = new ExcelJS.Workbook()
   const sortedWorksheet = exportWorkbook.addWorksheet("comparison")
-  noPaid.value.forEach((person, columnIndex) => {
-    const column = sortedWorksheet.getColumn(columnIndex ++)
-    person.name.forEach((my) => console.log(my))
-  } )
+  //const columnA = sortedWorksheet.getColumn('A') 
+  // noPaid.name.forEach((person) => { //nopaid name
+  //   let cellIndex = 1
+  //   // for (let i=0; i<3; i++){
+  //   const cell = column.getCell(cellIndex++)
+  //   cell.value = person.name
+  //   // }
+  // } )
 
+  // if (noPaid.name.length > noSeat.name.length){
+  //   const bigger = noPaid.length
+  // } else { const bigger = noSeat.length} will i need this ? idk yet
+
+  for(let i = 1; i < 23; i++){
+    sortedWorksheet.getCell(`A${i}`).value = 7
+  }
+
+  const buffer = await exportWorkbook.xlsx.writeBuffer()
+  const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+  const blob = new Blob([buffer], { type: fileType })
+  downloadComparisonURL.value = URL.createObjectURL(blob)
 }
 
 //xlsx
@@ -305,11 +323,6 @@ async function exportResultsAsXLSX() {
   const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
   const blob = new Blob([buffer], { type: fileType })
   downloadURL.value = URL.createObjectURL(blob)
-}
-
-function toggleKey() {
-  let showKey = true
-  console.log('showkey=' + showKey)
 }
 
 </script>
@@ -557,7 +570,7 @@ function toggleKey() {
             />
           </div>
 
-          <button class="keyBtn" @click="showComparison = !showComparison">Comparison</button>
+         <!--  <button class="keyBtn" @click="showComparison = !showComparison">Comparison</button>
         <div v-if="showComparison" class="key">
           <div>
           <h3>The following students have not paid but has a seat</h3>
@@ -572,11 +585,16 @@ function toggleKey() {
               src="/public/close.png"
               alt="x to close webpage"
             />
-        </div>
+        </div> -->
 
           <div v-if="sortedTables != null">
             <a v-if="downloadURL == null" disabled class="btn">Loading...</a>
             <a v-else :href="downloadURL" class="downloadBtn btn">Download Sorted Tables</a>
+          </div>
+
+          <div v-if="sortedTables != null">
+            <a v-if="downloadComparisonURL == null" disabled class="btn">Loading...</a>
+            <a v-else :href="downloadComparisonURL" class="downloadBtn btn">Download Comparison</a>
           </div>
         </div>
 
