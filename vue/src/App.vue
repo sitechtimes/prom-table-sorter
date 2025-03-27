@@ -23,7 +23,7 @@ const noSeat = reactive({
   osis: [],
 })
 let showKey = ref(false)
-//let showComparison = ref(false)
+let showComparison = ref(false)
 let showExample1 = ref(false)
 let showExample2 = ref(false)
 let showExample3 = ref(false)
@@ -142,7 +142,6 @@ async function compare(){
     name: [],
     id:[]
   }
-
   const paid = {
     name: [],
     id: [],
@@ -204,6 +203,7 @@ async function compare(){
     }
   }
 
+  exportComparisonsAsXLSX()
   //console.log(noPaid, noSeat)
   return allGroups
 }
@@ -262,7 +262,7 @@ async function executeSort() {
     alert(error.message)
   }
   exportResultsAsXLSX()
-  exportComparisonsAsXLSX()
+  //exportComparisonsAsXLSX()
 }
 
 async function exportComparisonsAsXLSX(){
@@ -281,9 +281,25 @@ async function exportComparisonsAsXLSX(){
   //   const bigger = noPaid.length
   // } else { const bigger = noSeat.length} will i need this ? idk yet
 
-  for(let i = 1; i < 23; i++){
-    sortedWorksheet.getCell(`A${i}`).value = 7
-  }
+  // for(let i = 1; i < 20; i++){
+  //   sortedWorksheet.getCell(`A${i}`).value = noPaid.name.length <- !!
+  //   console.log(noPaid.name)
+  // }
+
+  noPaid.name.forEach((person , columnIndex) => {
+    sortedWorksheet.getCell(`A${columnIndex}`).value = person 
+    console.log(person, columnIndex)
+  })
+
+  noPaid.osis.forEach((person , columnIndex) => {
+    sortedWorksheet.getCell(`B${columnIndex}`).value = person 
+    console.log(person, columnIndex)
+  })
+
+  
+  
+  
+  //console.log(noPaid)
 
   const buffer = await exportWorkbook.xlsx.writeBuffer()
   const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
@@ -570,7 +586,7 @@ async function exportResultsAsXLSX() {
             />
           </div>
 
-         <!--  <button class="keyBtn" @click="showComparison = !showComparison">Comparison</button>
+        <button class="keyBtn" @click="showComparison = !showComparison">Comparison</button>
         <div v-if="showComparison" class="key">
           <div>
           <h3>The following students have not paid but has a seat</h3>
@@ -585,7 +601,7 @@ async function exportResultsAsXLSX() {
               src="/public/close.png"
               alt="x to close webpage"
             />
-        </div> -->
+        </div> 
 
           <div v-if="sortedTables != null">
             <a v-if="downloadURL == null" disabled class="btn">Loading...</a>
@@ -886,8 +902,4 @@ img:hover {
   text-align: center;
 }
 
-.compareResult{
-  display: flex;
-  flex-wrap: wrap;
-}
 </style>
