@@ -268,38 +268,12 @@ async function executeSort() {
 async function exportComparisonsAsXLSX(){
   const exportWorkbook = new ExcelJS.Workbook()
   const sortedWorksheet = exportWorkbook.addWorksheet("comparison")
-  //const columnA = sortedWorksheet.getColumn('A') 
-  // noPaid.name.forEach((person) => { //nopaid name
-  //   let cellIndex = 1
-  //   // for (let i=0; i<3; i++){
-  //   const cell = column.getCell(cellIndex++)
-  //   cell.value = person.name
-  //   // }
-  // } )
 
-  // if (noPaid.name.length > noSeat.name.length){
-  //   const bigger = noPaid.length
-  // } else { const bigger = noSeat.length} will i need this ? idk yet
+  noPaid.name.forEach((person , columnIndex) => {sortedWorksheet.getCell(`A${columnIndex + 2}`).value = person })
+  noPaid.osis.forEach((person , columnIndex) => {sortedWorksheet.getCell(`B${columnIndex + 2 }`).value = person  })
+  noSeat.name.forEach((person , columnIndex) => {sortedWorksheet.getCell(`D${columnIndex + 2}`).value = person })
+  noSeat.osis.forEach((person , columnIndex) => { sortedWorksheet.getCell(`E${columnIndex + 2}`).value = person })
 
-  // for(let i = 1; i < 20; i++){
-  //   sortedWorksheet.getCell(`A${i}`).value = noPaid.name.length <- !!
-  //   console.log(noPaid.name)
-  // }
-
-  noPaid.name.forEach((person , columnIndex) => {
-    sortedWorksheet.getCell(`A${columnIndex}`).value = person 
-    console.log(person, columnIndex)
-  })
-
-  noPaid.osis.forEach((person , columnIndex) => {
-    sortedWorksheet.getCell(`B${columnIndex}`).value = person 
-    console.log(person, columnIndex)
-  })
-
-  
-  
-  
-  //console.log(noPaid)
 
   const buffer = await exportWorkbook.xlsx.writeBuffer()
   const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
@@ -589,11 +563,13 @@ async function exportResultsAsXLSX() {
         <button class="keyBtn" @click="showComparison = !showComparison">Comparison</button>
         <div v-if="showComparison" class="key">
           <div>
-          <h3>The following students have not paid but has a seat</h3>
-            <p class="compareResult">{{ noPaid}}</p>
-
-            <h3>The following students have paid but does not have a seat</h3>
-            <p class="compareResult">{{ noSeat}}</p>
+            <h3>Sort the Tables, and then Click to Download Comparison Excel Sheet</h3>
+            <div v-if="sortedTables != null">
+            <a v-if="downloadComparisonURL == null" disabled class="btn">Loading...</a>
+            <a v-else :href="downloadComparisonURL" class="downloadBtn btn">Download Comparison</a>
+          </div>
+            <p>Columns A and B, name and osis respectively, are for the people who have not paid but has a seat.</p>
+            <p>Columns D and E, name and osis respectively, are for the people who have paid but does not have a seat.</p>
           </div>
             <img
               @click="showComparison = !showComparison"
@@ -606,11 +582,6 @@ async function exportResultsAsXLSX() {
           <div v-if="sortedTables != null">
             <a v-if="downloadURL == null" disabled class="btn">Loading...</a>
             <a v-else :href="downloadURL" class="downloadBtn btn">Download Sorted Tables</a>
-          </div>
-
-          <div v-if="sortedTables != null">
-            <a v-if="downloadComparisonURL == null" disabled class="btn">Loading...</a>
-            <a v-else :href="downloadComparisonURL" class="downloadBtn btn">Download Comparison</a>
           </div>
         </div>
 
