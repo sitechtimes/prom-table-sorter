@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import ExcelJS from 'exceljs'
 import { rangeSort, algoFunctionOptions, arrayLen2D } from './sortingAlgo.js'
 import key from './components/key.vue'
@@ -9,25 +9,13 @@ const minSeats = ref(null)
 const maxSeats = ref(null)
 const dataFormat = ref(null)
 const fileInput = ref(null)
-const paidFileInput = ref(null)
 const downloadURL = ref(null)
-const downloadComparisonURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
-const noPaid = reactive({
-  name: [],
-  osis: [],
-})
-const noSeat = reactive({
-  name: [],
-  osis: [],
-})
 let showKey = ref(false)
-let showComparison = ref(false)
 let showExample1 = ref(false)
 let showExample2 = ref(false)
 let showExample3 = ref(false)
-
 
 function calcCellRange(inputCellRange) {
   const errorMsg = 'Invalid Cell Coordinates Inputted'
@@ -124,90 +112,6 @@ function processRawStr(rawStr, targetArr, dataFormat) {
   }
 }
 
-async function compare(){
-  const workbook = new ExcelJS.Workbook()
-  const paidWorkbook = new ExcelJS.Workbook()
-
-  const uploadedFile = await fileInput.value.files[0].arrayBuffer()
-  await workbook.xlsx.load(uploadedFile)
-  const groupWorksheet = workbook.worksheets[0]
-
-  const paidFile = await paidFileInput.value.files[0].arrayBuffer()
-  await paidWorkbook.xlsx.load(paidFile)
-  
-  const paidFirstColumn = paidWorkbook.worksheets[0].getColumn('A');
-  const paidSecondColumn = paidWorkbook.worksheets[0].getColumn('B')
-
-  const attending = {
-    name: [],
-    id:[]
-  }
-  const paid = {
-    name: [],
-    id: [],
-  }
-
-  paidFirstColumn.eachCell((cell) => {paid.name.push(cell.value)})
-  paidSecondColumn.eachCell((cell) => {paid.id.push(cell.value)})
-
-  let allGroups = []
-  if (searchAllCells.value == true) {
-    groupWorksheet.eachRow((row) => {
-      let individualGroup = []
-      row.eachCell((cell) => {
-        processRawStr(cell.value, individualGroup, dataFormat.value)
-      })
-      allGroups.push(individualGroup)
-    })
-  } else {
-    const processedCellRange = calcCellRange(cellRange.value) // format: [[3, 12], [10, 18]]
-    for (
-      let rowIndex = processedCellRange[0][1];
-      rowIndex <= processedCellRange[1][1];
-      rowIndex++
-    ) {
-      const row = groupWorksheet.getRow(rowIndex)
-      let individualGroup = []
-      for (
-        let columnIndex = processedCellRange[0][0];
-        columnIndex <= processedCellRange[1][0];
-        columnIndex++
-      ) {
-        const cell = row.getCell(columnIndex)
-        processRawStr(cell.value, individualGroup, dataFormat.value)
-      }
-      allGroups.push(individualGroup)
-    }
-  }
-
-  allGroups.forEach((group) => {
-    group.forEach((person) => {
-        attending.name.push(person.name);
-        attending.id.push(person.id);
-    });
-  });
-
-  for(let i=0; i < attending.name.length; i++){
-    if(paid.id.includes(attending.id[i]) === false){
-      //console.log(attending.name[i] + " did not pay but has a seat")
-      noPaid.name.push(attending.name[i])
-      noPaid.osis.push(attending.id[i])
-    } 
-  }
-
-  for(let i=0; i < paid.name.length; i++){
-    if(attending.id.includes(paid.id[i]) === false){
-      //console.log(paid.name[i] + " paid but does not have a seat")
-      noSeat.name.push(paid.name[i])
-      noSeat.osis.push(paid.id[i])
-    }
-  }
-
-  exportComparisonsAsXLSX()
-  //console.log(noPaid, noSeat)
-  return allGroups
-}
-
 //xlsx
 async function getGroups() {
   const uploadedFile = await fileInput.value.files[0].arrayBuffer()
@@ -248,7 +152,6 @@ async function getGroups() {
 }
 
 async function executeSort() {
-  compare()
   const guestGroups = await getGroups()
   try {
     sortedTables.value = rangeSort(
@@ -262,23 +165,6 @@ async function executeSort() {
     alert(error.message)
   }
   exportResultsAsXLSX()
-  //exportComparisonsAsXLSX()
-}
-
-async function exportComparisonsAsXLSX(){
-  const exportWorkbook = new ExcelJS.Workbook()
-  const sortedWorksheet = exportWorkbook.addWorksheet("comparison")
-
-  noPaid.name.forEach((person , columnIndex) => {sortedWorksheet.getCell(`A${columnIndex + 2}`).value = person })
-  noPaid.osis.forEach((person , columnIndex) => {sortedWorksheet.getCell(`B${columnIndex + 2 }`).value = person  })
-  noSeat.name.forEach((person , columnIndex) => {sortedWorksheet.getCell(`D${columnIndex + 2}`).value = person })
-  noSeat.osis.forEach((person , columnIndex) => { sortedWorksheet.getCell(`E${columnIndex + 2}`).value = person })
-
-
-  const buffer = await exportWorkbook.xlsx.writeBuffer()
-  const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
-  const blob = new Blob([buffer], { type: fileType })
-  downloadComparisonURL.value = URL.createObjectURL(blob)
 }
 
 //xlsx
@@ -315,6 +201,10 @@ async function exportResultsAsXLSX() {
   downloadURL.value = URL.createObjectURL(blob)
 }
 
+function toggleKey() {
+  let showKey = true
+  console.log('showkey=' + showKey)
+}
 </script>
 
 <template>
@@ -383,20 +273,6 @@ async function exportResultsAsXLSX() {
               accept=".xlsx"
               required
             />
-          </div>
-          <div class="fileUpload">
-            <h3>Upload Excel file of those who paid</h3>
-            <label class="uploadBtn" for="upload-file2"><img src="/icons/fileUpload.png" /></label>
-            <input
-              id="upload-file2"
-              class="btn"
-              type="file"
-              name="input-groups"
-              ref="paidFileInput"
-              accept=".xlsx"
-            />
-            
-            <p id="fileUplaodCaption">name in the first column, the osis numbers in the second</p>
           </div>
 
           <div class="dataFormat">
@@ -497,7 +373,6 @@ async function exportResultsAsXLSX() {
                 required
                 placeholder="B2"
               />
-
             </div>
             <!-- End of rangeContainerFromto div -->
             <div class="searchAllCells">
@@ -541,7 +416,6 @@ async function exportResultsAsXLSX() {
           </div>
           <!-- End of seatRange div -->
           <button @click="executeSort" class="btn" id="sortBtn">Sort</button>
-          
         </div>
         <!-- End of form div -->
       </div>
@@ -559,32 +433,11 @@ async function exportResultsAsXLSX() {
               alt="x to close webpage"
             />
           </div>
-
-        <button class="keyBtn" @click="showComparison = !showComparison">Comparison</button>
-        <div v-if="showComparison" class="key">
-          <div>
-            <h3>Sort the Tables, and then Click to Download Comparison Excel Sheet</h3>
-            <div v-if="sortedTables != null">
-            <a v-if="downloadComparisonURL == null" disabled class="btn">Loading...</a>
-            <a v-else :href="downloadComparisonURL" class="downloadBtn btn">Download Comparison</a>
-          </div>
-            <p>Columns A and B, name and osis respectively, are for the people who have not paid but has a seat.</p>
-            <p>Columns D and E, name and osis respectively, are for the people who have paid but does not have a seat.</p>
-          </div>
-            <img
-              @click="showComparison = !showComparison"
-              class="closeIcon"
-              src="/public/close.png"
-              alt="x to close webpage"
-            />
-        </div> 
-
           <div v-if="sortedTables != null">
             <a v-if="downloadURL == null" disabled class="btn">Loading...</a>
             <a v-else :href="downloadURL" class="downloadBtn btn">Download Sorted Tables</a>
           </div>
         </div>
-
         <div id="tables">
           <div class="table" v-for="table in sortedTables">
             <div class="tableHeaderContainer">
@@ -616,9 +469,7 @@ async function exportResultsAsXLSX() {
 <style lang="css" scoped>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
-
 .body {
-  /* position: relative; */
   padding: 2rem;
 }
 
@@ -672,7 +523,6 @@ async function exportResultsAsXLSX() {
   align-items: center;
   margin-top: 1rem;
 }
-
 
 h1 {
   font-family: 'Playfair Display', serif;
@@ -744,11 +594,6 @@ ul {
   transform: scale(1.25);
 }
 
-#fileUploadCaption{
-  display: flex;
-  flex-wrap: wrap;
-}
-
 input[type='radio'] {
   width: 1.5rem;
   height: 1.5rem;
@@ -781,10 +626,6 @@ img:hover {
 }
 
 #upload-file {
-  display: none;
-}
-
-#upload-file2 {
   display: none;
 }
 
@@ -872,5 +713,4 @@ img:hover {
   width: 8rem;
   text-align: center;
 }
-
 </style>
