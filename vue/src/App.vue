@@ -8,22 +8,22 @@ const sortedTables = ref(null)
 const minSeats = ref(null)
 const maxSeats = ref(null)
 const dataFormat = ref(null)
-const fileInput = ref(null)
-const paidFileInput = ref(null)
-const downloadURL = ref(null)
-const downloadComparisonURL = ref(null)
+const uploadedGroupFile = ref(null)
+const uploadedPaidFile = ref(null)
+const downloadGroupExcelFileURL = ref(null)
+const downloadComparisonExcelFileURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
 const noPaid = reactive({
   name: [],
-  osis: [],
+  id: [],
 })
 const noSeat = reactive({
   name: [],
-  osis: [],
+  id: [],
 })
 let showKey = ref(false)
-let showComparison = ref(false)
+let showComparisonWindow = ref(false)
 let showExample1 = ref(false)
 let showExample2 = ref(false)
 let showExample3 = ref(false)
@@ -124,15 +124,15 @@ function processRawStr(rawStr, targetArr, dataFormat) {
   }
 }
 
-async function compare(){
+async function comparisonOfSeatsandPayment(){
   const workbook = new ExcelJS.Workbook()
   const paidWorkbook = new ExcelJS.Workbook()
 
-  const uploadedFile = await fileInput.value.files[0].arrayBuffer()
+  const uploadedFile = await uploadedGroupFile.value.files[0].arrayBuffer()
   await workbook.xlsx.load(uploadedFile)
   const groupWorksheet = workbook.worksheets[0]
 
-  const paidFile = await paidFileInput.value.files[0].arrayBuffer()
+  const paidFile = await uploadedPaidFile.value.files[0].arrayBuffer()
   await paidWorkbook.xlsx.load(paidFile)
   
   const paidFirstColumn = paidWorkbook.worksheets[0].getColumn('A');
@@ -191,7 +191,7 @@ async function compare(){
     if(paid.id.includes(attending.id[i]) === false){
       //console.log(attending.name[i] + " did not pay but has a seat")
       noPaid.name.push(attending.name[i])
-      noPaid.osis.push(attending.id[i])
+      noPaid.id.push(attending.id[i])
     } 
   }
 
@@ -199,7 +199,7 @@ async function compare(){
     if(attending.id.includes(paid.id[i]) === false){
       //console.log(paid.name[i] + " paid but does not have a seat")
       noSeat.name.push(paid.name[i])
-      noSeat.osis.push(paid.id[i])
+      noSeat.id.push(paid.id[i])
     }
   }
 
@@ -210,7 +210,7 @@ async function compare(){
 
 //xlsx
 async function getGroups() {
-  const uploadedFile = await fileInput.value.files[0].arrayBuffer()
+  const uploadedFile = await uploadedGroupFile.value.files[0].arrayBuffer()
   const importWorkbook = new ExcelJS.Workbook()
   await importWorkbook.xlsx.load(uploadedFile)
   const groupWorksheet = importWorkbook.worksheets[0]
@@ -248,7 +248,7 @@ async function getGroups() {
 }
 
 async function executeSort() {
-  compare()
+  comparisonOfSeatsandPayment()
   const guestGroups = await getGroups()
   try {
     sortedTables.value = rangeSort(
@@ -267,18 +267,18 @@ async function executeSort() {
 
 async function exportComparisonsAsXLSX(){
   const exportWorkbook = new ExcelJS.Workbook()
-  const sortedWorksheet = exportWorkbook.addWorksheet("comparison")
+  const sortedWorksheet = exportWorkbook.addWorksheet("Comparison Worksheet")
 
   noPaid.name.forEach((person , columnIndex) => {sortedWorksheet.getCell(`A${columnIndex + 2}`).value = person })
-  noPaid.osis.forEach((person , columnIndex) => {sortedWorksheet.getCell(`B${columnIndex + 2 }`).value = person  })
+  noPaid.id.forEach((person , columnIndex) => {sortedWorksheet.getCell(`B${columnIndex + 2 }`).value = person  })
   noSeat.name.forEach((person , columnIndex) => {sortedWorksheet.getCell(`D${columnIndex + 2}`).value = person })
-  noSeat.osis.forEach((person , columnIndex) => { sortedWorksheet.getCell(`E${columnIndex + 2}`).value = person })
+  noSeat.id.forEach((person , columnIndex) => { sortedWorksheet.getCell(`E${columnIndex + 2}`).value = person })
 
 
   const buffer = await exportWorkbook.xlsx.writeBuffer()
   const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
   const blob = new Blob([buffer], { type: fileType })
-  downloadComparisonURL.value = URL.createObjectURL(blob)
+  downloadComparisonExcelFileURL.value = URL.createObjectURL(blob)
 }
 
 //xlsx
@@ -312,7 +312,7 @@ async function exportResultsAsXLSX() {
   const buffer = await exportWorkbook.xlsx.writeBuffer()
   const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
   const blob = new Blob([buffer], { type: fileType })
-  downloadURL.value = URL.createObjectURL(blob)
+  downloadGroupExcelFileURL.value = URL.createObjectURL(blob)
 }
 
 </script>
@@ -379,7 +379,7 @@ async function exportResultsAsXLSX() {
               class="btn"
               type="file"
               name="input-groups"
-              ref="fileInput"
+              ref="uploadedGroupFile"
               accept=".xlsx"
               required
             />
@@ -392,11 +392,11 @@ async function exportResultsAsXLSX() {
               class="btn"
               type="file"
               name="input-groups"
-              ref="paidFileInput"
+              ref="uploadedPaidFile"
               accept=".xlsx"
             />
             
-            <p id="fileUplaodCaption">name in the first column, the osis numbers in the second</p>
+            <p id="fileUplaodCaption">name in the first column, the id numbers in the second</p>
           </div>
 
           <div class="dataFormat">
@@ -560,19 +560,19 @@ async function exportResultsAsXLSX() {
             />
           </div>
 
-        <button class="keyBtn" @click="showComparison = !showComparison">Comparison</button>
-        <div v-if="showComparison" class="key">
+        <button class="keyBtn" @click="showComparisonWindow = !showComparisonWindow">Comparison</button>
+        <div v-if="showComparisonWindow" class="key">
           <div>
-            <h3>Sort the Tables, and then Click to Download Comparison Excel Sheet</h3>
+            <h3>Sort the Tables, and then click to Download Comparison Excel Sheet</h3>
             <div v-if="sortedTables != null">
-            <a v-if="downloadComparisonURL == null" disabled class="btn">Loading...</a>
-            <a v-else :href="downloadComparisonURL" class="downloadBtn btn">Download Comparison</a>
+            <a v-if="downloadComparisonExcelFileURL == null" disabled class="btn">Loading...</a>
+            <a v-else :href="downloadComparisonExcelFileURL" class="downloadBtn btn">Download Comparison</a>
           </div>
-            <p>Columns A and B, name and osis respectively, are for the people who have not paid but has a seat.</p>
-            <p>Columns D and E, name and osis respectively, are for the people who have paid but does not have a seat.</p>
+            <p>Columns A and B, name and id respectively, are for the people who have not paid but has a seat.</p>
+            <p>Columns D and E, name and id respectively, are for the people who have paid but does not have a seat.</p>
           </div>
             <img
-              @click="showComparison = !showComparison"
+              @click="showComparisonWindow = !showComparisonWindow"
               class="closeIcon"
               src="/public/close.png"
               alt="x to close webpage"
@@ -580,8 +580,8 @@ async function exportResultsAsXLSX() {
         </div> 
 
           <div v-if="sortedTables != null">
-            <a v-if="downloadURL == null" disabled class="btn">Loading...</a>
-            <a v-else :href="downloadURL" class="downloadBtn btn">Download Sorted Tables</a>
+            <a v-if="downloadGroupExcelFileURL == null" disabled class="btn">Loading...</a>
+            <a v-else :href="downloadGroupExcelFileURL" class="downloadBtn btn">Download Sorted Tables</a>
           </div>
         </div>
 
@@ -617,10 +617,6 @@ async function exportResultsAsXLSX() {
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 
-.body {
-  /* position: relative; */
-  padding: 2rem;
-}
 
 .main {
   color: #372b69;
@@ -719,6 +715,10 @@ ul {
   font-size: 1.5rem;
 }
 
+.btn{
+  display:none;
+}
+
 #sortBtn {
   font-size: 1.5rem;
   font-family:
@@ -742,11 +742,6 @@ ul {
 
 #sortBtn:active {
   transform: scale(1.25);
-}
-
-#fileUploadCaption{
-  display: flex;
-  flex-wrap: wrap;
 }
 
 input[type='radio'] {
@@ -778,14 +773,6 @@ img:hover {
   padding-left: 0.5rem;
   border-radius: 5px;
   cursor: pointer;
-}
-
-#upload-file {
-  display: none;
-}
-
-#upload-file2 {
-  display: none;
 }
 
 .dataFormat {
