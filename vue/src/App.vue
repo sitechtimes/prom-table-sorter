@@ -14,19 +14,14 @@ const downloadGroupExcelFileURL = ref(null)
 const downloadComparisonExcelFileURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
-const noPaid = reactive({
-  name: [],
-  id: [],
-})
-const noSeat = reactive({
-  name: [],
-  id: [],
-})
+const noPaid = reactive([])
+const noSeat = reactive([])
 let showKey = ref(false)
 let showComparisonWindow = ref(false)
 let showExample1 = ref(false)
 let showExample2 = ref(false)
 let showExample3 = ref(false)
+let showpaidExample = ref(false)
 
 
 function calcCellRange(inputCellRange) {
@@ -135,20 +130,18 @@ async function comparisonOfSeatsandPayment(){
   const paidFile = await uploadedPaidFile.value.files[0].arrayBuffer()
   await paidWorkbook.xlsx.load(paidFile)
   
-  const paidFirstColumn = paidWorkbook.worksheets[0].getColumn('A');
-  const paidSecondColumn = paidWorkbook.worksheets[0].getColumn('B')
-
   const attending = {
     name: [],
     id:[]
   }
-  const paid = {
-    name: [],
-    id: [],
-  }
 
-  paidFirstColumn.eachCell((cell) => {paid.name.push(cell.value)})
-  paidSecondColumn.eachCell((cell) => {paid.id.push(cell.value)})
+const paid = []
+
+for(let i=1; i <= paidWorkbook.worksheets[0].actualRowCount; i++){
+  const newPaidObject = {name: paidWorkbook.worksheets[0].getCell(`A${i}`).value, id: paidWorkbook.worksheets[0].getCell(`B${i}`).value}
+  paid.push(newPaidObject)
+}
+  
 
   let allGroups = []
   if (searchAllCells.value == true) {
@@ -187,24 +180,23 @@ async function comparisonOfSeatsandPayment(){
     });
   });
 
-  for(let i=0; i < attending.name.length; i++){
-    if(paid.id.includes(attending.id[i]) === false){
-      //console.log(attending.name[i] + " did not pay but has a seat")
-      noPaid.name.push(attending.name[i])
-      noPaid.id.push(attending.id[i])
-    } 
-  }
+  // for(let i=0; i < attending.name.length; i++){
+  //   if(paid.id.includes(attending.id[i]) === false){
+  //     //console.log(attending.name[i] + " did not pay but has a seat")
+  //     noPaid.name.push(attending.name[i])
+  //     noPaid.id.push(attending.id[i])
+  //   } 
+  // }
 
-  for(let i=0; i < paid.name.length; i++){
-    if(attending.id.includes(paid.id[i]) === false){
-      //console.log(paid.name[i] + " paid but does not have a seat")
-      noSeat.name.push(paid.name[i])
-      noSeat.id.push(paid.id[i])
-    }
-  }
+  // for(let i=0; i < paid.name.length; i++){
+  //   if(attending.id.includes(paid.id[i]) === false){
+  //     //console.log(paid.name[i] + " paid but does not have a seat")
+  //     noSeat.name.push(paid.name[i])
+  //     noSeat.id.push(paid.id[i])
+  //   }
+  // }
 
   exportComparisonsAsXLSX()
-  //console.log(noPaid, noSeat)
   return allGroups
 }
 
@@ -262,17 +254,25 @@ async function executeSort() {
     alert(error.message)
   }
   exportResultsAsXLSX()
-  //exportComparisonsAsXLSX()
 }
 
 async function exportComparisonsAsXLSX(){
   const exportWorkbook = new ExcelJS.Workbook()
   const sortedWorksheet = exportWorkbook.addWorksheet("Comparison Worksheet")
+  sortedWorksheet.mergeCells('A1:B1')
+  sortedWorksheet.getCell('A1').value = "Has a seat but did not pay"
+  sortedWorksheet.getCell('A2').value = "Name"
+  sortedWorksheet.getCell('D2').value = "Name"
+  sortedWorksheet.getCell('B2').value = "Cell"
+  sortedWorksheet.getCell('E2').value = "Cell"
 
-  noPaid.name.forEach((person , columnIndex) => {sortedWorksheet.getCell(`A${columnIndex + 2}`).value = person })
-  noPaid.id.forEach((person , columnIndex) => {sortedWorksheet.getCell(`B${columnIndex + 2 }`).value = person  })
-  noSeat.name.forEach((person , columnIndex) => {sortedWorksheet.getCell(`D${columnIndex + 2}`).value = person })
-  noSeat.id.forEach((person , columnIndex) => { sortedWorksheet.getCell(`E${columnIndex + 2}`).value = person })
+  sortedWorksheet.mergeCells('D1:E1')
+  sortedWorksheet.getCell('D1').value = "Has paid but does not have a seat"
+
+  noPaid.name.forEach((person , columnIndex) => {sortedWorksheet.getCell(`A${columnIndex + 3}`).value = person })
+  noPaid.id.forEach((person , columnIndex) => {sortedWorksheet.getCell(`B${columnIndex + 3 }`).value = person  })
+  noSeat.name.forEach((person , columnIndex) => {sortedWorksheet.getCell(`D${columnIndex + 3}`).value = person })
+  noSeat.id.forEach((person , columnIndex) => { sortedWorksheet.getCell(`E${columnIndex + 3}`).value = person })
 
 
   const buffer = await exportWorkbook.xlsx.writeBuffer()
@@ -376,7 +376,7 @@ async function exportResultsAsXLSX() {
             <label class="uploadBtn" for="upload-file"><img src="/icons/fileUpload.png" /></label>
             <input
               id="upload-file"
-              class="btn"
+              class="upload-btn"
               type="file"
               name="input-groups"
               ref="uploadedGroupFile"
@@ -384,19 +384,34 @@ async function exportResultsAsXLSX() {
               required
             />
           </div>
+
+          <div v-if="showpaidExample" class="ex example1">
+            <p>Names should be in Column A while IDs should be in Column B</p>
+          <img
+            src="/public/paidExample.png"
+            alt="Example image of several names in one cell each, filling multiple rows and cells per row"
+          />
+          <img
+            @click="showpaidExample = !showpaidExample"
+            class="closeIcon"
+            src="/public/close.png"
+            alt="x to close webpage"
+          />
+        </div>
           <div class="fileUpload">
+            
             <h3>Upload Excel file of those who paid</h3>
             <label class="uploadBtn" for="upload-file2"><img src="/icons/fileUpload.png" /></label>
             <input
               id="upload-file2"
-              class="btn"
+              class="upload-btn"
               type="file"
               name="input-groups"
               ref="uploadedPaidFile"
               accept=".xlsx"
             />
             
-            <p id="fileUplaodCaption">name in the first column, the id numbers in the second</p>
+            <img class="example" @click="showpaidExample = !showpaidExample" src="/icons/hint.png" />
           </div>
 
           <div class="dataFormat">
@@ -568,8 +583,6 @@ async function exportResultsAsXLSX() {
             <a v-if="downloadComparisonExcelFileURL == null" disabled class="btn">Loading...</a>
             <a v-else :href="downloadComparisonExcelFileURL" class="downloadBtn btn">Download Comparison</a>
           </div>
-            <p>Columns A and B, name and id respectively, are for the people who have not paid but has a seat.</p>
-            <p>Columns D and E, name and id respectively, are for the people who have paid but does not have a seat.</p>
           </div>
             <img
               @click="showComparisonWindow = !showComparisonWindow"
@@ -662,6 +675,10 @@ async function exportResultsAsXLSX() {
   overflow-y: scroll;
 }
 
+.upload-btn{
+  display:none;
+}
+
 .searchAllCells {
   display: flex;
   flex-direction: row;
@@ -715,9 +732,7 @@ ul {
   font-size: 1.5rem;
 }
 
-.btn{
-  display:none;
-}
+
 
 #sortBtn {
   font-size: 1.5rem;
