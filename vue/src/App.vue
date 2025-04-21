@@ -125,82 +125,48 @@ async function comparisonOfSeatsandPayment(){
 
   const uploadedFile = await uploadedGroupFile.value.files[0].arrayBuffer()
   await workbook.xlsx.load(uploadedFile)
-  const groupWorksheet = workbook.worksheets[0]
 
   const paidFile = await uploadedPaidFile.value.files[0].arrayBuffer()
   await paidWorkbook.xlsx.load(paidFile)
   
-  const attending = {
-    name: [],
-    id:[]
-  }
+  const attending = []
 
-const paid = []
+  const paid = []
 
-for(let i=1; i <= paidWorkbook.worksheets[0].actualRowCount; i++){
+  const guestGroups = await getGroups()
+
+for(let i = 1; i <= paidWorkbook.worksheets[0].actualRowCount; i++){
   const newPaidObject = {name: paidWorkbook.worksheets[0].getCell(`A${i}`).value, id: paidWorkbook.worksheets[0].getCell(`B${i}`).value}
   paid.push(newPaidObject)
 }
-  
 
-  let allGroups = []
-  if (searchAllCells.value == true) {
-    groupWorksheet.eachRow((row) => {
-      let individualGroup = []
-      row.eachCell((cell) => {
-        processRawStr(cell.value, individualGroup, dataFormat.value)
-      })
-      allGroups.push(individualGroup)
-    })
-  } else {
-    const processedCellRange = calcCellRange(cellRange.value) // format: [[3, 12], [10, 18]]
-    for (
-      let rowIndex = processedCellRange[0][1];
-      rowIndex <= processedCellRange[1][1];
-      rowIndex++
-    ) {
-      const row = groupWorksheet.getRow(rowIndex)
-      let individualGroup = []
-      for (
-        let columnIndex = processedCellRange[0][0];
-        columnIndex <= processedCellRange[1][0];
-        columnIndex++
-      ) {
-        const cell = row.getCell(columnIndex)
-        processRawStr(cell.value, individualGroup, dataFormat.value)
-      }
-      allGroups.push(individualGroup)
-    }
-  }
-
-  allGroups.forEach((group) => {
+  guestGroups.forEach((group) => {
     group.forEach((person) => {
-        attending.name.push(person.name);
-        attending.id.push(person.id);
+        const attendent = {name: person.name, id:person.id}
+        attending.push(attendent)
     });
   });
 
-  // for(let i=0; i < attending.name.length; i++){
-  //   if(paid.id.includes(attending.id[i]) === false){
-  //     //console.log(attending.name[i] + " did not pay but has a seat")
-  //     noPaid.name.push(attending.name[i])
-  //     noPaid.id.push(attending.id[i])
-  //   } 
-  // }
+  const paidIds = []
+  paid.forEach((person) => paidIds.push(person.id))
 
-  // for(let i=0; i < paid.name.length; i++){
-  //   if(attending.id.includes(paid.id[i]) === false){
-  //     //console.log(paid.name[i] + " paid but does not have a seat")
-  //     noSeat.name.push(paid.name[i])
-  //     noSeat.id.push(paid.id[i])
-  //   }
-  // }
+  const filtering = []
+  
+  for(let i=0; i < attending.length; i++){
+    if(paidIds.includes(attending[i].id) === true){
+      filtering.push(attending[i])
+    } else {
+      noPaid.push(attending[i])
+    }
+  }  
 
+  const updatedPaid = paid.filter(person => !filtering.some(filterItem => filterItem.id === person.id));
+  updatedPaid.forEach((person) => noSeat.push(person))
+  
   exportComparisonsAsXLSX()
-  return allGroups
-}
+  }
 
-//xlsx
+
 async function getGroups() {
   const uploadedFile = await uploadedGroupFile.value.files[0].arrayBuffer()
   const importWorkbook = new ExcelJS.Workbook()
@@ -248,7 +214,7 @@ async function executeSort() {
       algoFunctionOptions,
       maxSeats.value,
       minSeats.value,
-      dataFormat.value == 'rows-columns-with-id'
+      dataFormat.value == 'rows-columns-with-id',
     )
   } catch (error) {
     alert(error.message)
@@ -269,10 +235,10 @@ async function exportComparisonsAsXLSX(){
   sortedWorksheet.mergeCells('D1:E1')
   sortedWorksheet.getCell('D1').value = "Has paid but does not have a seat"
 
-  noPaid.name.forEach((person , columnIndex) => {sortedWorksheet.getCell(`A${columnIndex + 3}`).value = person })
-  noPaid.id.forEach((person , columnIndex) => {sortedWorksheet.getCell(`B${columnIndex + 3 }`).value = person  })
-  noSeat.name.forEach((person , columnIndex) => {sortedWorksheet.getCell(`D${columnIndex + 3}`).value = person })
-  noSeat.id.forEach((person , columnIndex) => { sortedWorksheet.getCell(`E${columnIndex + 3}`).value = person })
+  noPaid.forEach((person , columnIndex) => {sortedWorksheet.getCell(`A${columnIndex + 3}`).value = person.name })
+  noPaid.forEach((person , columnIndex) => {sortedWorksheet.getCell(`B${columnIndex + 3 }`).value = person.id  })
+  noSeat.forEach((person , columnIndex) => {sortedWorksheet.getCell(`D${columnIndex + 3}`).value = person.name })
+  noSeat.forEach((person , columnIndex) => { sortedWorksheet.getCell(`E${columnIndex + 3}`).value = person.id })
 
 
   const buffer = await exportWorkbook.xlsx.writeBuffer()
