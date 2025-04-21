@@ -14,6 +14,7 @@ const downloadGroupExcelFileURL = ref(null)
 const downloadComparisonExcelFileURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
+const validDataFormat = ref(true)
 const noPaid = reactive([])
 const noSeat = reactive([])
 let showKey = ref(false)
@@ -119,6 +120,11 @@ function processRawStr(rawStr, targetArr, dataFormat) {
   }
 }
 
+function invalidateDataFormat(){
+  validDataFormat.value = ! validDataFormat.value
+}
+
+
 async function comparisonOfSeatsandPayment(){
   const workbook = new ExcelJS.Workbook()
   const paidWorkbook = new ExcelJS.Workbook()
@@ -128,12 +134,13 @@ async function comparisonOfSeatsandPayment(){
 
   const paidFile = await uploadedPaidFile.value.files[0].arrayBuffer()
   await paidWorkbook.xlsx.load(paidFile)
-  
+
   const attending = []
 
   const paid = []
 
   const guestGroups = await getGroups()
+
 
 for(let i = 1; i <= paidWorkbook.worksheets[0].actualRowCount; i++){
   const newPaidObject = {name: paidWorkbook.worksheets[0].getCell(`A${i}`).value, id: paidWorkbook.worksheets[0].getCell(`B${i}`).value}
@@ -365,7 +372,6 @@ async function exportResultsAsXLSX() {
           />
         </div>
           <div class="fileUpload">
-            
             <h3>Upload Excel file of those who paid</h3>
             <label class="uploadBtn" for="upload-file2"><img src="/icons/fileUpload.png" /></label>
             <input
@@ -375,6 +381,7 @@ async function exportResultsAsXLSX() {
               name="input-groups"
               ref="uploadedPaidFile"
               accept=".xlsx"
+              @change="invalidateDataFormat()"
             />
             
             <img class="example" @click="showpaidExample = !showpaidExample" src="/icons/hint.png" />
@@ -382,14 +389,23 @@ async function exportResultsAsXLSX() {
 
           <div class="dataFormat">
             <h3>2. Select data file format</h3>
-            <div class="dataFormatContainer">
-              <input
+            <div class="dataFormatContainer" >
+              <input v-if="validDataFormat"
                 class="checkbox"
                 v-model="dataFormat"
                 type="radio"
                 id="rows-columns"
                 value="rows-columns"
                 checked
+              />
+              <input v-else
+              class="checkbox"
+                v-model="dataFormat"
+                type="radio"
+                id="rows-columns"
+                value="rows-columns"
+                checked
+                disabled
               />
               <label class="containerCheck" for="rows-columns"
                 >Each row has one person's name in each cell</label
@@ -398,12 +414,20 @@ async function exportResultsAsXLSX() {
             </div>
             <!-- End of dataFormatContainer 1 div -->
             <div class="dataFormatContainer">
-              <input
+              <input v-if="validDataFormat"
                 v-model="dataFormat"
                 class="checkbox"
                 type="radio"
                 id="single-cell-comma-seperated"
                 value="single-cell-comma-seperated"
+              />
+              <input v-else
+                v-model="dataFormat"
+                class="checkbox"
+                type="radio"
+                id="single-cell-comma-seperated"
+                value="single-cell-comma-seperated"
+                disabled
               />
               <label class="containerCheck" for="single-cell-comma-seperated"
                 >One cell per row has all of a group's names in it
@@ -542,12 +566,18 @@ async function exportResultsAsXLSX() {
           </div>
 
         <button class="keyBtn" @click="showComparisonWindow = !showComparisonWindow">Comparison</button>
-        <div v-if="showComparisonWindow" class="key">
+        <div v-if="showComparisonWindow" class="key" id="comparisonWindow">
           <div>
             <h3>Sort the Tables, and then click to Download Comparison Excel Sheet</h3>
             <div v-if="sortedTables != null">
             <a v-if="downloadComparisonExcelFileURL == null" disabled class="btn">Loading...</a>
             <a v-else :href="downloadComparisonExcelFileURL" class="downloadBtn btn">Download Comparison</a>
+            <div class="comparisonList" v-if="sortedTables != null">
+              <h4>Has a seat, but no payment</h4>
+              <li v-for="person in noPaid"> {{ person.name }} ({{ person.id }})</li>
+              <h4>Has paid, but no seat</h4>
+              <li v-for="student in noSeat"> {{ student.name }} ({{ student.id }})</li>
+            </div>
           </div>
           </div>
             <img
@@ -698,8 +728,6 @@ ul {
   font-size: 1.5rem;
 }
 
-
-
 #sortBtn {
   font-size: 1.5rem;
   font-family:
@@ -839,6 +867,11 @@ img:hover {
   text-align: center;
   width: 8rem;
   text-align: center;
+}
+
+#comparisonWindow{
+  overflow: scroll;
+  height:30rem;
 }
 
 </style>
