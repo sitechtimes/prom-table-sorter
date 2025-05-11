@@ -15,8 +15,8 @@ const downloadComparisonExcelFileURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
 const validDataFormat = ref(true)
-const hasNotPaid = reactive([])
-const hasNoSeat = reactive([])
+let hasNotPaid = reactive([])
+let hasNoSeat = reactive([])
 let showKey = ref(false)
 let showComparisonWindow = ref(false)
 let showExample1 = ref(false)
@@ -138,24 +138,10 @@ for(let i = 1; i <= paidWorkbook.worksheets[0].actualRowCount; i++){
   const newPaidObject = {name: paidWorkbook.worksheets[0].getCell(`A${i}`).value, id: paidWorkbook.worksheets[0].getCell(`B${i}`).value}
   paid.push(newPaidObject)
 }
-
   const attending = guestGroups.flat()
-  const paidIds = []
-  paid.forEach((person) => paidIds.push(person.id))
+  hasNotPaid = attending.filter((person) => !paid.map((person) => person.id).includes(person.id))
+  hasNoSeat = paid.filter((person) => !attending.map((person)  => person.id).includes(person.id));
 
-  const hasASeat = []
-  
-  for(let i=0; i < attending.length; i++){
-    if(paidIds.includes(attending[i].id) === true){
-      hasASeat.push(attending[i])
-    } else {
-      hasNotPaid.push(attending[i])
-    }
-  }  
-
-  const updatedPaid = paid.filter(person => !hasASeat.some(filterItem => filterItem.id === person.id));
-  updatedPaid.forEach((person) => hasNoSeat.push(person))
-  
   exportComparisonsAsXLSX()
   }
 
