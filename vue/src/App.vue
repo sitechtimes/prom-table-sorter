@@ -15,8 +15,8 @@ const downloadComparisonExcelFileURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
 const validDataFormat = ref(true)
-const noPaid = reactive([])
-const noSeat = reactive([])
+const hasNotPaid = reactive([])
+const hasNoSeat = reactive([])
 let showKey = ref(false)
 let showComparisonWindow = ref(false)
 let showExample1 = ref(false)
@@ -120,55 +120,41 @@ function processRawStr(rawStr, targetArr, dataFormat) {
   }
 }
 
-function invalidateDataFormat(){
+function toggleDataFormat(){
   validDataFormat.value = ! validDataFormat.value
 }
 
-
-async function comparisonOfSeatsandPayment(){
+async function compareSeatAndPay(){
   const workbook = new ExcelJS.Workbook()
   const paidWorkbook = new ExcelJS.Workbook()
-
   const uploadedFile = await uploadedGroupFile.value.files[0].arrayBuffer()
   await workbook.xlsx.load(uploadedFile)
-
   const paidFile = await uploadedPaidFile.value.files[0].arrayBuffer()
   await paidWorkbook.xlsx.load(paidFile)
-
-  const attending = []
-
   const paid = []
-
   const guestGroups = await getGroups()
-
 
 for(let i = 1; i <= paidWorkbook.worksheets[0].actualRowCount; i++){
   const newPaidObject = {name: paidWorkbook.worksheets[0].getCell(`A${i}`).value, id: paidWorkbook.worksheets[0].getCell(`B${i}`).value}
   paid.push(newPaidObject)
 }
 
-  guestGroups.forEach((group) => {
-    group.forEach((person) => {
-        const attendent = {name: person.name, id:person.id}
-        attending.push(attendent)
-    });
-  });
-
+  const attending = guestGroups.flat()
   const paidIds = []
   paid.forEach((person) => paidIds.push(person.id))
 
-  const filtering = []
+  const hasASeat = []
   
   for(let i=0; i < attending.length; i++){
     if(paidIds.includes(attending[i].id) === true){
-      filtering.push(attending[i])
+      hasASeat.push(attending[i])
     } else {
-      noPaid.push(attending[i])
+      hasNotPaid.push(attending[i])
     }
   }  
 
-  const updatedPaid = paid.filter(person => !filtering.some(filterItem => filterItem.id === person.id));
-  updatedPaid.forEach((person) => noSeat.push(person))
+  const updatedPaid = paid.filter(person => !hasASeat.some(filterItem => filterItem.id === person.id));
+  updatedPaid.forEach((person) => hasNoSeat.push(person))
   
   exportComparisonsAsXLSX()
   }
@@ -213,7 +199,7 @@ async function getGroups() {
 }
 
 async function executeSort() {
-  comparisonOfSeatsandPayment()
+  compareSeatAndPay()
   const guestGroups = await getGroups()
   try {
     sortedTables.value = rangeSort(
@@ -227,25 +213,31 @@ async function executeSort() {
     alert(error.message)
   }
   exportResultsAsXLSX()
+  exportComparisonsAsXLSX()
 }
 
 async function exportComparisonsAsXLSX(){
   const exportWorkbook = new ExcelJS.Workbook()
   const sortedWorksheet = exportWorkbook.addWorksheet("Comparison Worksheet")
-  sortedWorksheet.mergeCells('A1:B1')
+  sortedWorksheet.mergeCells('A1:A2')
   sortedWorksheet.getCell('A1').value = "Has a seat but did not pay"
-  sortedWorksheet.getCell('A2').value = "Name"
-  sortedWorksheet.getCell('D2').value = "Name"
+  sortedWorksheet.getCell('B1').value = "Name"
   sortedWorksheet.getCell('B2').value = "Cell"
-  sortedWorksheet.getCell('E2').value = "Cell"
 
-  sortedWorksheet.mergeCells('D1:E1')
-  sortedWorksheet.getCell('D1').value = "Has paid but does not have a seat"
+  sortedWorksheet.mergeCells('A4:A5')
+  sortedWorksheet.getCell('A4').value = "Has a paid but does not have a seat"
+  sortedWorksheet.getCell('B4').value = "Name"
+  sortedWorksheet.getCell('B5').value = "Cell"
 
-  noPaid.forEach((person , columnIndex) => {sortedWorksheet.getCell(`A${columnIndex + 3}`).value = person.name })
-  noPaid.forEach((person , columnIndex) => {sortedWorksheet.getCell(`B${columnIndex + 3 }`).value = person.id  })
-  noSeat.forEach((person , columnIndex) => {sortedWorksheet.getCell(`D${columnIndex + 3}`).value = person.name })
-  noSeat.forEach((person , columnIndex) => { sortedWorksheet.getCell(`E${columnIndex + 3}`).value = person.id })
+  hasNotPaid.forEach((person, rowIndex) => {
+    sortedWorksheet.getRow(1).getCell(rowIndex + 3).value = person.name
+    sortedWorksheet.getRow(2).getCell(rowIndex + 3).value = person.id
+  })
+
+  hasNoSeat.forEach((person, rowIndex) => {
+    sortedWorksheet.getRow(4).getCell(rowIndex + 3).value = person.name
+    sortedWorksheet.getRow(5).getCell(rowIndex + 3).value = person.id
+});
 
 
   const buffer = await exportWorkbook.xlsx.writeBuffer()
@@ -381,7 +373,7 @@ async function exportResultsAsXLSX() {
               name="input-groups"
               ref="uploadedPaidFile"
               accept=".xlsx"
-              @change="invalidateDataFormat()"
+              @change="toggleDataFormat()"
             />
             
             <img class="example" @click="showpaidExample = !showpaidExample" src="/icons/hint.png" />
@@ -574,9 +566,9 @@ async function exportResultsAsXLSX() {
             <a v-else :href="downloadComparisonExcelFileURL" class="downloadBtn btn">Download Comparison</a>
             <div class="comparisonList" v-if="sortedTables != null">
               <h4>Has a seat, but no payment</h4>
-              <li v-for="person in noPaid"> {{ person.name }} ({{ person.id }})</li>
+              <li v-for="person in hasNotPaid"> {{ person.name }} ({{ person.id }})</li>
               <h4>Has paid, but no seat</h4>
-              <li v-for="student in noSeat"> {{ student.name }} ({{ student.id }})</li>
+              <li v-for="student in hasNoSeat"> {{ student.name }} ({{ student.id }})</li>
             </div>
           </div>
           </div>
