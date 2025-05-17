@@ -124,7 +124,7 @@ function toggleDataFormat(){
   validDataFormat.value = ! validDataFormat.value
 }
 
-async function compareSeatAndPay(){
+async function compareSeatAndPay(guestGroups){
   const workbook = new ExcelJS.Workbook()
   const paidWorkbook = new ExcelJS.Workbook()
   const uploadedFile = await uploadedGroupFile.value.files[0].arrayBuffer()
@@ -132,7 +132,6 @@ async function compareSeatAndPay(){
   const paidFile = await uploadedPaidFile.value.files[0].arrayBuffer()
   await paidWorkbook.xlsx.load(paidFile)
   const paid = []
-  const guestGroups = await getGroups()
 
 for(let i = 1; i <= paidWorkbook.worksheets[0].actualRowCount; i++){
   const newPaidObject = {name: paidWorkbook.worksheets[0].getCell(`A${i}`).value, id: paidWorkbook.worksheets[0].getCell(`B${i}`).value}
@@ -181,11 +180,11 @@ async function getGroups() {
     }
   }
 
+  compareSeatAndPay(allGroups)
   return allGroups
 }
 
 async function executeSort() {
-  compareSeatAndPay()
   const guestGroups = await getGroups()
   try {
     sortedTables.value = rangeSort(
@@ -205,26 +204,30 @@ async function executeSort() {
 async function exportComparisonsAsXLSX(){
   const exportWorkbook = new ExcelJS.Workbook()
   const sortedWorksheet = exportWorkbook.addWorksheet("Comparison Worksheet")
-  sortedWorksheet.mergeCells('A1:A2')
+  sortedWorksheet.mergeCells('A1:B1')
   sortedWorksheet.getCell('A1').value = "Has a seat but did not pay"
-  sortedWorksheet.getCell('B1').value = "Name"
+  sortedWorksheet.getCell('A2').value = "Name"
   sortedWorksheet.getCell('B2').value = "Cell"
 
-  sortedWorksheet.mergeCells('A4:A5')
-  sortedWorksheet.getCell('A4').value = "Has a paid but does not have a seat"
-  sortedWorksheet.getCell('B4').value = "Name"
-  sortedWorksheet.getCell('B5').value = "Cell"
+  sortedWorksheet.mergeCells('D1:E1')
+  sortedWorksheet.getCell('D1').value = "Has paid but does not have a seat"
+  sortedWorksheet.getCell('D2').value = "Name"
+  sortedWorksheet.getCell('E2').value = "Cell"
 
-  hasNotPaid.forEach((person, rowIndex) => {
-    sortedWorksheet.getRow(1).getCell(rowIndex + 3).value = person.name
-    sortedWorksheet.getRow(2).getCell(rowIndex + 3).value = person.id
+  let paidRowIndex = 3
+  let seatRowIndex = 3
+
+  hasNotPaid.forEach((person) => {
+    sortedWorksheet.getRow(paidRowIndex).getCell(1).value = person.name
+    sortedWorksheet.getRow(paidRowIndex).getCell(2).value = person.id
+    paidRowIndex++
   })
 
-  hasNoSeat.forEach((person, rowIndex) => {
-    sortedWorksheet.getRow(4).getCell(rowIndex + 3).value = person.name
-    sortedWorksheet.getRow(5).getCell(rowIndex + 3).value = person.id
-});
-
+  hasNoSeat.forEach((person) => {
+    sortedWorksheet.getRow(seatRowIndex).getCell(4).value = person.name
+    sortedWorksheet.getRow(seatRowIndex).getCell(5).value = person.id
+    seatRowIndex++
+  })
 
   const buffer = await exportWorkbook.xlsx.writeBuffer()
   const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
