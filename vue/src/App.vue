@@ -213,20 +213,16 @@ async function exportComparisonsAsXLSX(){
   sortedWorksheet.getCell('D2').value = "Name"
   sortedWorksheet.getCell('E2').value = "Cell"
 
-  let paidRowIndex = 3
-  let seatRowIndex = 3
-
-  hasNotPaid.forEach((person) => {
-    sortedWorksheet.getRow(paidRowIndex).getCell(1).value = person.name
-    sortedWorksheet.getRow(paidRowIndex).getCell(2).value = person.id
-    paidRowIndex++
-  })
-
-  hasNoSeat.forEach((person) => {
-    sortedWorksheet.getRow(seatRowIndex).getCell(4).value = person.name
-    sortedWorksheet.getRow(seatRowIndex).getCell(5).value = person.id
-    seatRowIndex++
-  })
+  for(let i=0; i<hasNotPaid.length; i++){ 
+      sortedWorksheet.getRow(i+3).getCell(1).value = hasNotPaid[i].name
+      sortedWorksheet.getRow(i+3).getCell(2).value = hasNotPaid[i].id
+  }
+  
+  
+  for(let i=0; i <hasNoSeat.length; i++){
+    sortedWorksheet.getRow(i+3).getCell(4).value = hasNoSeat[i].name
+    sortedWorksheet.getRow(i+3).getCell(5).value = hasNoSeat[i].id
+  }
 
   const buffer = await exportWorkbook.xlsx.writeBuffer()
   const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
