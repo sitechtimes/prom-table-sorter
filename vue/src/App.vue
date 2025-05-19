@@ -198,7 +198,6 @@ async function executeSort() {
     alert(error.message)
   }
   exportResultsAsXLSX()
-  exportComparisonsAsXLSX()
 }
 
 async function exportComparisonsAsXLSX(){
