@@ -24,7 +24,6 @@ let showExample2 = ref(false)
 let showExample3 = ref(false)
 let showpaidExample = ref(false)
 
-
 function calcCellRange(inputCellRange) {
   const errorMsg = 'Invalid Cell Coordinates Inputted'
   const numArr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -120,11 +119,11 @@ function processRawStr(rawStr, targetArr, dataFormat) {
   }
 }
 
-function toggleDataFormat(){
-  validDataFormat.value = ! validDataFormat.value
+function toggleDataFormat() {
+  validDataFormat.value = !validDataFormat.value
 }
 
-async function compareSeatAndPay(guestGroups){
+async function compareSeatAndPay(guestGroups) {
   const workbook = new ExcelJS.Workbook()
   const paidWorkbook = new ExcelJS.Workbook()
   const uploadedFile = await uploadedGroupFile.value.files[0].arrayBuffer()
@@ -133,17 +132,17 @@ async function compareSeatAndPay(guestGroups){
   await paidWorkbook.xlsx.load(paidFile)
   const paid = []
 
-for(let i = 1; i <= paidWorkbook.worksheets[0].actualRowCount; i++){
-  const newPaidObject = {name: paidWorkbook.worksheets[0].getCell(`A${i}`).value, id: paidWorkbook.worksheets[0].getCell(`B${i}`).value}
-  paid.push(newPaidObject)
-}
+  for (let i = 1; i <= paidWorkbook.worksheets[0].actualRowCount; i++) {
+    const newPaidObject = {
+      name: paidWorkbook.worksheets[0].getCell(`A${i}`).value,
+      id: paidWorkbook.worksheets[0].getCell(`B${i}`).value
+    }
+    paid.push(newPaidObject)
+  }
   const attending = guestGroups.flat()
   hasNotPaid = attending.filter((person) => !paid.map((person) => person.id).includes(person.id))
-  hasNoSeat = paid.filter((person) => !attending.map((person)  => person.id).includes(person.id));
-
-  exportComparisonsAsXLSX()
-  }
-
+  hasNoSeat = paid.filter((person) => !attending.map((person) => person.id).includes(person.id))
+}
 
 async function getGroups() {
   const uploadedFile = await uploadedGroupFile.value.files[0].arrayBuffer()
@@ -179,8 +178,6 @@ async function getGroups() {
       allGroups.push(individualGroup)
     }
   }
-
-  compareSeatAndPay(allGroups)
   return allGroups
 }
 
@@ -192,26 +189,29 @@ async function executeSort() {
       algoFunctionOptions,
       maxSeats.value,
       minSeats.value,
-      dataFormat.value == 'rows-columns-with-id',
+      dataFormat.value == 'rows-columns-with-id'
     )
+    exportResultsAsXLSX()
+    compareSeatAndPay(guestGroups).then(() => {
+      exportComparisonsAsXLSX()
+    })
   } catch (error) {
     alert(error.message)
   }
-  exportResultsAsXLSX()
 }
 
-async function exportComparisonsAsXLSX(){
+async function exportComparisonsAsXLSX() {
   const exportWorkbook = new ExcelJS.Workbook()
-  const sortedWorksheet = exportWorkbook.addWorksheet("Comparison Worksheet")
+  const sortedWorksheet = exportWorkbook.addWorksheet('Comparison Worksheet')
   sortedWorksheet.mergeCells('A1:B1')
-  sortedWorksheet.getCell('A1').value = "Has a seat but did not pay"
-  sortedWorksheet.getCell('A2').value = "Name"
-  sortedWorksheet.getCell('B2').value = "Cell"
+  sortedWorksheet.getCell('A1').value = 'Has a seat but did not pay'
+  sortedWorksheet.getCell('A2').value = 'Name'
+  sortedWorksheet.getCell('B2').value = 'Cell'
 
   sortedWorksheet.mergeCells('D1:E1')
-  sortedWorksheet.getCell('D1').value = "Has paid but does not have a seat"
-  sortedWorksheet.getCell('D2').value = "Name"
-  sortedWorksheet.getCell('E2').value = "Cell"
+  sortedWorksheet.getCell('D1').value = 'Has paid but does not have a seat'
+  sortedWorksheet.getCell('D2').value = 'Name'
+  sortedWorksheet.getCell('E2').value = 'Cell'
 
   let paidRowIndex = 3
   let seatRowIndex = 3
@@ -267,7 +267,6 @@ async function exportResultsAsXLSX() {
   const blob = new Blob([buffer], { type: fileType })
   downloadGroupExcelFileURL.value = URL.createObjectURL(blob)
 }
-
 </script>
 
 <template>
@@ -340,17 +339,17 @@ async function exportResultsAsXLSX() {
 
           <div v-if="showpaidExample" class="ex example1">
             <p>Names should be in Column A while IDs should be in Column B</p>
-          <img
-            src="/public/paidExample.png"
-            alt="Example image of several names in one cell each, filling multiple rows and cells per row"
-          />
-          <img
-            @click="showpaidExample = !showpaidExample"
-            class="closeIcon"
-            src="/public/close.png"
-            alt="x to close webpage"
-          />
-        </div>
+            <img
+              src="/public/paidExample.png"
+              alt="Example image of several names in one cell each, filling multiple rows and cells per row"
+            />
+            <img
+              @click="showpaidExample = !showpaidExample"
+              class="closeIcon"
+              src="/public/close.png"
+              alt="x to close webpage"
+            />
+          </div>
           <div class="fileUpload">
             <h3>Upload Excel file of those who paid</h3>
             <label class="uploadBtn" for="upload-file2"><img src="/icons/fileUpload.png" /></label>
@@ -363,14 +362,19 @@ async function exportResultsAsXLSX() {
               accept=".xlsx"
               @change="toggleDataFormat()"
             />
-            
-            <img class="example" @click="showpaidExample = !showpaidExample" src="/icons/hint.png" />
+
+            <img
+              class="example"
+              @click="showpaidExample = !showpaidExample"
+              src="/icons/hint.png"
+            />
           </div>
 
           <div class="dataFormat">
             <h3>2. Select data file format</h3>
-            <div class="dataFormatContainer" >
-              <input v-if="validDataFormat"
+            <div class="dataFormatContainer">
+              <input
+                v-if="validDataFormat"
                 class="checkbox"
                 v-model="dataFormat"
                 type="radio"
@@ -378,8 +382,9 @@ async function exportResultsAsXLSX() {
                 value="rows-columns"
                 checked
               />
-              <input v-else
-              class="checkbox"
+              <input
+                v-else
+                class="checkbox"
                 v-model="dataFormat"
                 type="radio"
                 id="rows-columns"
@@ -394,14 +399,16 @@ async function exportResultsAsXLSX() {
             </div>
             <!-- End of dataFormatContainer 1 div -->
             <div class="dataFormatContainer">
-              <input v-if="validDataFormat"
+              <input
+                v-if="validDataFormat"
                 v-model="dataFormat"
                 class="checkbox"
                 type="radio"
                 id="single-cell-comma-seperated"
                 value="single-cell-comma-seperated"
               />
-              <input v-else
+              <input
+                v-else
                 v-model="dataFormat"
                 class="checkbox"
                 type="radio"
@@ -482,7 +489,6 @@ async function exportResultsAsXLSX() {
                 required
                 placeholder="B2"
               />
-
             </div>
             <!-- End of rangeContainerFromto div -->
             <div class="searchAllCells">
@@ -526,7 +532,6 @@ async function exportResultsAsXLSX() {
           </div>
           <!-- End of seatRange div -->
           <button @click="executeSort" class="btn" id="sortBtn">Sort</button>
-          
         </div>
         <!-- End of form div -->
       </div>
@@ -545,32 +550,38 @@ async function exportResultsAsXLSX() {
             />
           </div>
 
-        <button class="keyBtn" @click="showComparisonWindow = !showComparisonWindow">Comparison</button>
-        <div v-if="showComparisonWindow" class="key" id="comparisonWindow">
-          <div>
-            <h3>Sort the Tables, and then click to Download Comparison Excel Sheet</h3>
-            <div v-if="sortedTables != null">
-            <a v-if="downloadComparisonExcelFileURL == null" disabled class="btn">Loading...</a>
-            <a v-else :href="downloadComparisonExcelFileURL" class="downloadBtn btn">Download Comparison</a>
-            <div class="comparisonList" v-if="sortedTables != null">
-              <h4>Has a seat, but no payment</h4>
-              <li v-for="person in hasNotPaid"> {{ person.name }} ({{ person.id }})</li>
-              <h4>Has paid, but no seat</h4>
-              <li v-for="student in hasNoSeat"> {{ student.name }} ({{ student.id }})</li>
+          <button class="keyBtn" @click="showComparisonWindow = !showComparisonWindow">
+            Comparison
+          </button>
+          <div v-if="showComparisonWindow" class="key" id="comparisonWindow">
+            <div>
+              <h3>Sort the Tables, and then click to Download Comparison Excel Sheet</h3>
+              <div v-if="sortedTables != null">
+                <a v-if="downloadComparisonExcelFileURL == null" disabled class="btn">Loading...</a>
+                <a v-else :href="downloadComparisonExcelFileURL" class="downloadBtn btn"
+                  >Download Comparison</a
+                >
+                <div class="comparisonList" v-if="sortedTables != null">
+                  <h4>Has a seat, but no payment</h4>
+                  <li v-for="person in hasNotPaid">{{ person.name }} ({{ person.id }})</li>
+                  <h4>Has paid, but no seat</h4>
+                  <li v-for="student in hasNoSeat">{{ student.name }} ({{ student.id }})</li>
+                </div>
+              </div>
             </div>
-          </div>
-          </div>
             <img
               @click="showComparisonWindow = !showComparisonWindow"
               class="closeIcon"
               src="/public/close.png"
               alt="x to close webpage"
             />
-        </div> 
+          </div>
 
           <div v-if="sortedTables != null">
             <a v-if="downloadGroupExcelFileURL == null" disabled class="btn">Loading...</a>
-            <a v-else :href="downloadGroupExcelFileURL" class="downloadBtn btn">Download Sorted Tables</a>
+            <a v-else :href="downloadGroupExcelFileURL" class="downloadBtn btn"
+              >Download Sorted Tables</a
+            >
           </div>
         </div>
 
@@ -604,8 +615,6 @@ async function exportResultsAsXLSX() {
 
 <style lang="css" scoped>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-
-
 
 .main {
   color: #372b69;
@@ -651,8 +660,8 @@ async function exportResultsAsXLSX() {
   overflow-y: scroll;
 }
 
-.upload-btn{
-  display:none;
+.upload-btn {
+  display: none;
 }
 
 .searchAllCells {
@@ -661,7 +670,6 @@ async function exportResultsAsXLSX() {
   align-items: center;
   margin-top: 1rem;
 }
-
 
 h1 {
   font-family: 'Playfair Display', serif;
@@ -849,9 +857,8 @@ img:hover {
   text-align: center;
 }
 
-#comparisonWindow{
+#comparisonWindow {
   overflow: scroll;
-  height:30rem;
+  height: 30rem;
 }
-
 </style>
