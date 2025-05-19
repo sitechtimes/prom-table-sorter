@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import ExcelJS from 'exceljs'
 import { rangeSort, algoFunctionOptions, arrayLen2D } from './sortingAlgo.js'
 import key from './components/key.vue'
@@ -8,14 +8,21 @@ const sortedTables = ref(null)
 const minSeats = ref(null)
 const maxSeats = ref(null)
 const dataFormat = ref(null)
-const fileInput = ref(null)
-const downloadURL = ref(null)
+const uploadedGroupFile = ref(null)
+const uploadedPaidFile = ref(null)
+const downloadGroupExcelFileURL = ref(null)
+const downloadComparisonExcelFileURL = ref(null)
 const cellRange = ref([null, null])
 const searchAllCells = ref(false)
+const validDataFormat = ref(true)
+let hasNotPaid = reactive([])
+let hasNoSeat = reactive([])
 let showKey = ref(false)
+let showComparisonWindow = ref(false)
 let showExample1 = ref(false)
 let showExample2 = ref(false)
 let showExample3 = ref(false)
+let showpaidExample = ref(false)
 
 function calcCellRange(inputCellRange) {
   const errorMsg = 'Invalid Cell Coordinates Inputted'
@@ -112,9 +119,33 @@ function processRawStr(rawStr, targetArr, dataFormat) {
   }
 }
 
-//xlsx
+function toggleDataFormat() {
+  validDataFormat.value = !validDataFormat.value
+}
+
+async function compareSeatAndPay(guestGroups) {
+  const workbook = new ExcelJS.Workbook()
+  const paidWorkbook = new ExcelJS.Workbook()
+  const uploadedFile = await uploadedGroupFile.value.files[0].arrayBuffer()
+  await workbook.xlsx.load(uploadedFile)
+  const paidFile = await uploadedPaidFile.value.files[0].arrayBuffer()
+  await paidWorkbook.xlsx.load(paidFile)
+  const paid = []
+
+  for (let i = 1; i <= paidWorkbook.worksheets[0].actualRowCount; i++) {
+    const newPaidObject = {
+      name: paidWorkbook.worksheets[0].getCell(`A${i}`).value,
+      id: paidWorkbook.worksheets[0].getCell(`B${i}`).value
+    }
+    paid.push(newPaidObject)
+  }
+  const attending = guestGroups.flat()
+  hasNotPaid = attending.filter((person) => !paid.map((person) => person.id).includes(person.id))
+  hasNoSeat = paid.filter((person) => !attending.map((person) => person.id).includes(person.id))
+}
+
 async function getGroups() {
-  const uploadedFile = await fileInput.value.files[0].arrayBuffer()
+  const uploadedFile = await uploadedGroupFile.value.files[0].arrayBuffer()
   const importWorkbook = new ExcelJS.Workbook()
   await importWorkbook.xlsx.load(uploadedFile)
   const groupWorksheet = importWorkbook.worksheets[0]
@@ -147,7 +178,6 @@ async function getGroups() {
       allGroups.push(individualGroup)
     }
   }
-
   return allGroups
 }
 
@@ -161,10 +191,43 @@ async function executeSort() {
       minSeats.value,
       dataFormat.value == 'rows-columns-with-id'
     )
+    exportResultsAsXLSX()
+    compareSeatAndPay(guestGroups).then(() => {
+      exportComparisonsAsXLSX()
+    })
   } catch (error) {
     alert(error.message)
   }
-  exportResultsAsXLSX()
+}
+
+async function exportComparisonsAsXLSX() {
+  const exportWorkbook = new ExcelJS.Workbook()
+  const sortedWorksheet = exportWorkbook.addWorksheet('Comparison Worksheet')
+  sortedWorksheet.mergeCells('A1:B1')
+  sortedWorksheet.getCell('A1').value = 'Has a seat but did not pay'
+  sortedWorksheet.getCell('A2').value = 'Name'
+  sortedWorksheet.getCell('B2').value = 'Cell'
+
+  sortedWorksheet.mergeCells('D1:E1')
+  sortedWorksheet.getCell('D1').value = 'Has paid but does not have a seat'
+  sortedWorksheet.getCell('D2').value = 'Name'
+  sortedWorksheet.getCell('E2').value = 'Cell'
+
+  for(let i=0; i<hasNotPaid.length; i++){ 
+      sortedWorksheet.getRow(i+3).getCell(1).value = hasNotPaid[i].name
+      sortedWorksheet.getRow(i+3).getCell(2).value = hasNotPaid[i].id
+  }
+  
+  
+  for(let i=0; i <hasNoSeat.length; i++){
+    sortedWorksheet.getRow(i+3).getCell(4).value = hasNoSeat[i].name
+    sortedWorksheet.getRow(i+3).getCell(5).value = hasNoSeat[i].id
+  }
+
+  const buffer = await exportWorkbook.xlsx.writeBuffer()
+  const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+  const blob = new Blob([buffer], { type: fileType })
+  downloadComparisonExcelFileURL.value = URL.createObjectURL(blob)
 }
 
 //xlsx
@@ -198,12 +261,7 @@ async function exportResultsAsXLSX() {
   const buffer = await exportWorkbook.xlsx.writeBuffer()
   const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
   const blob = new Blob([buffer], { type: fileType })
-  downloadURL.value = URL.createObjectURL(blob)
-}
-
-function toggleKey() {
-  let showKey = true
-  console.log('showkey=' + showKey)
+  downloadGroupExcelFileURL.value = URL.createObjectURL(blob)
 }
 </script>
 
@@ -266,12 +324,45 @@ function toggleKey() {
             <label class="uploadBtn" for="upload-file"><img src="/icons/fileUpload.png" /></label>
             <input
               id="upload-file"
-              class="btn"
+              class="upload-btn"
               type="file"
               name="input-groups"
-              ref="fileInput"
+              ref="uploadedGroupFile"
               accept=".xlsx"
               required
+            />
+          </div>
+
+          <div v-if="showpaidExample" class="ex example1">
+            <p>Names should be in Column A while IDs should be in Column B</p>
+            <img
+              src="/public/paidExample.png"
+              alt="Example image of several names in one cell each, filling multiple rows and cells per row"
+            />
+            <img
+              @click="showpaidExample = !showpaidExample"
+              class="closeIcon"
+              src="/public/close.png"
+              alt="x to close webpage"
+            />
+          </div>
+          <div class="fileUpload">
+            <h3>Upload Excel file of those who paid</h3>
+            <label class="uploadBtn" for="upload-file2"><img src="/icons/fileUpload.png" /></label>
+            <input
+              id="upload-file2"
+              class="upload-btn"
+              type="file"
+              name="input-groups"
+              ref="uploadedPaidFile"
+              accept=".xlsx"
+              @change="toggleDataFormat()"
+            />
+
+            <img
+              class="example"
+              @click="showpaidExample = !showpaidExample"
+              src="/icons/hint.png"
             />
           </div>
 
@@ -279,12 +370,23 @@ function toggleKey() {
             <h3>2. Select data file format</h3>
             <div class="dataFormatContainer">
               <input
+                v-if="validDataFormat"
                 class="checkbox"
                 v-model="dataFormat"
                 type="radio"
                 id="rows-columns"
                 value="rows-columns"
                 checked
+              />
+              <input
+                v-else
+                class="checkbox"
+                v-model="dataFormat"
+                type="radio"
+                id="rows-columns"
+                value="rows-columns"
+                checked
+                disabled
               />
               <label class="containerCheck" for="rows-columns"
                 >Each row has one person's name in each cell</label
@@ -294,11 +396,21 @@ function toggleKey() {
             <!-- End of dataFormatContainer 1 div -->
             <div class="dataFormatContainer">
               <input
+                v-if="validDataFormat"
                 v-model="dataFormat"
                 class="checkbox"
                 type="radio"
                 id="single-cell-comma-seperated"
                 value="single-cell-comma-seperated"
+              />
+              <input
+                v-else
+                v-model="dataFormat"
+                class="checkbox"
+                type="radio"
+                id="single-cell-comma-seperated"
+                value="single-cell-comma-seperated"
+                disabled
               />
               <label class="containerCheck" for="single-cell-comma-seperated"
                 >One cell per row has all of a group's names in it
@@ -433,11 +545,42 @@ function toggleKey() {
               alt="x to close webpage"
             />
           </div>
+
+          <button class="keyBtn" @click="showComparisonWindow = !showComparisonWindow">
+            Comparison
+          </button>
+          <div v-if="showComparisonWindow" class="key" id="comparisonWindow">
+            <div>
+              <h3>Sort the Tables, and then click to Download Comparison Excel Sheet</h3>
+              <div v-if="sortedTables != null">
+                <a v-if="downloadComparisonExcelFileURL == null" disabled class="btn">Loading...</a>
+                <a v-else :href="downloadComparisonExcelFileURL" class="downloadBtn btn"
+                  >Download Comparison</a
+                >
+                <div class="comparisonList" v-if="sortedTables != null">
+                  <h4>Has a seat, but no payment</h4>
+                  <li v-for="person in hasNotPaid">{{ person.name }} ({{ person.id }})</li>
+                  <h4>Has paid, but no seat</h4>
+                  <li v-for="student in hasNoSeat">{{ student.name }} ({{ student.id }})</li>
+                </div>
+              </div>
+            </div>
+            <img
+              @click="showComparisonWindow = !showComparisonWindow"
+              class="closeIcon"
+              src="/public/close.png"
+              alt="x to close webpage"
+            />
+          </div>
+
           <div v-if="sortedTables != null">
-            <a v-if="downloadURL == null" disabled class="btn">Loading...</a>
-            <a v-else :href="downloadURL" class="downloadBtn btn">Download Sorted Tables</a>
+            <a v-if="downloadGroupExcelFileURL == null" disabled class="btn">Loading...</a>
+            <a v-else :href="downloadGroupExcelFileURL" class="downloadBtn btn"
+              >Download Sorted Tables</a
+            >
           </div>
         </div>
+
         <div id="tables">
           <div class="table" v-for="table in sortedTables">
             <div class="tableHeaderContainer">
@@ -468,10 +611,6 @@ function toggleKey() {
 
 <style lang="css" scoped>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-
-.body {
-  padding: 2rem;
-}
 
 .main {
   color: #372b69;
@@ -515,6 +654,10 @@ function toggleKey() {
   height: 80vh;
   width: 45vw;
   overflow-y: scroll;
+}
+
+.upload-btn {
+  display: none;
 }
 
 .searchAllCells {
@@ -625,10 +768,6 @@ img:hover {
   cursor: pointer;
 }
 
-#upload-file {
-  display: none;
-}
-
 .dataFormat {
   display: flex;
   flex-direction: column;
@@ -712,5 +851,10 @@ img:hover {
   text-align: center;
   width: 8rem;
   text-align: center;
+}
+
+#comparisonWindow {
+  overflow: scroll;
+  height: 30rem;
 }
 </style>
