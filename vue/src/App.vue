@@ -140,8 +140,10 @@ async function compareSeatAndPay(guestGroups) {
     paid.push(newPaidObject)
   }
   const attending = guestGroups.flat()
-  hasNotPaid = attending.filter((person) => !paid.map((person) => person.id).includes(person.id))
-  hasNoSeat = paid.filter((person) => !attending.map((person) => person.id).includes(person.id))
+  const paidIDs = paid.map((person) => person.id)
+  hasNotPaid = attending.filter((person) => !paidIDs.includes(person.id))
+  const attendingIDs = attending.map((person) => person.id)
+  hasNoSeat = paid.filter((person) => !attendingIDs.includes(person.id))
 }
 
 async function getGroups() {
@@ -213,15 +215,14 @@ async function exportComparisonsAsXLSX() {
   sortedWorksheet.getCell('D2').value = 'Name'
   sortedWorksheet.getCell('E2').value = 'Cell'
 
-  for(let i=0; i<hasNotPaid.length; i++){ 
-      sortedWorksheet.getRow(i+3).getCell(1).value = hasNotPaid[i].name
-      sortedWorksheet.getRow(i+3).getCell(2).value = hasNotPaid[i].id
+  for (let i = 0; i < hasNotPaid.length; i++) {
+    sortedWorksheet.getRow(i + 3).getCell(1).value = hasNotPaid[i].name
+    sortedWorksheet.getRow(i + 3).getCell(2).value = hasNotPaid[i].id
   }
-  
-  
-  for(let i=0; i <hasNoSeat.length; i++){
-    sortedWorksheet.getRow(i+3).getCell(4).value = hasNoSeat[i].name
-    sortedWorksheet.getRow(i+3).getCell(5).value = hasNoSeat[i].id
+
+  for (let i = 0; i < hasNoSeat.length; i++) {
+    sortedWorksheet.getRow(i + 3).getCell(4).value = hasNoSeat[i].name
+    sortedWorksheet.getRow(i + 3).getCell(5).value = hasNoSeat[i].id
   }
 
   const buffer = await exportWorkbook.xlsx.writeBuffer()
